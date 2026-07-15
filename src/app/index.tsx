@@ -40,7 +40,7 @@ export default function HomeScreen() {
         </ThemedView>
 
         <ThemedText type="code" style={styles.code}>
-          get started
+          get started aaaa
         </ThemedText>
 
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
+    paddingTop: Spacing.six,
   },
   heroSection: {
     alignItems: 'center',
