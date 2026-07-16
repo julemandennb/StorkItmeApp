@@ -1,25 +1,61 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
+import { login } from '@/services/auth';
+import { router } from "expo-router";
 import { useState } from 'react';
 import { Button, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
+
 export default function LoginScreen() {
+  const [isLoading, setIsLoading] = useState(false);
+    const [url, setUrl] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { loginSuccess,loggedIn, logout  } = useAuth();
+
+    const handleLogin = async () => {
+      if (isLoading) return; 
+      setIsLoading(true);
+      try {
+        await login(url, email, password);
+        await loginSuccess(); 
+        alert('Logged in');
+
+         router.replace("/");
+      } catch (error: any) {
+        alert('Error: ' + error.message);
+        console.error('Login error:', error);
+      }
+      finally {
+        setIsLoading(false);
+      }
+    };
 
     const theme = useTheme();
     return (
         <ThemedView style={styles.container}>
             <SafeAreaView style={styles.safeArea}>
             
+
+            {!loggedIn ? (
+<>
                 <ThemedText type="title">Login</ThemedText>
 
                 <ThemedView type="backgroundElement" style={styles.stepContainer}>
+
+
+                    <ThemedText type="default">URL</ThemedText>
+                    <TextInput
+                        style={[styles.input, { color: theme['text'] }]}   
+                        value={url}
+                        onChangeText={setUrl}
+                    />
 
                     <ThemedText type="default">Email</ThemedText>
                     <TextInput
@@ -38,16 +74,31 @@ export default function LoginScreen() {
 
                    <View style={styles.buttonContainer}>
                         <Button
-                            title="Login"
-                            disabled={!email || !password}
+                             title={isLoading ? "Logging in..." : "Login"}
+                            disabled={!url || !email || !password || isLoading}
                             onPress={() => {
-                            console.log('login');
+                              handleLogin();
                             }}
                         />
                     </View>
 
 
                 </ThemedView>
+                </>
+            ) : (
+                <ThemedView type="backgroundElement" style={styles.stepContainer}>
+
+                  <Button
+                            title="Logout"
+                            onPress={() => {
+                              logout();
+                            }}
+                        />
+
+                </ThemedView>
+
+                
+            )}
             </SafeAreaView>
         </ThemedView>
     );
