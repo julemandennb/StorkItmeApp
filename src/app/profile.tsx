@@ -1,0 +1,176 @@
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+
+import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/hooks/use-theme';
+import { GetApiUrl, apiPut } from '@/services/api';
+import { useState } from 'react';
+import { Button, StyleSheet, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function HomeScreen() {
+    const theme = useTheme();
+
+
+    const { name, email, phoneNumber, userGroups, StorkItmeGroups,checkUser } = useAuth();
+    const apiUrl = GetApiUrl();
+     
+    
+    const [newEmail, setEmail] = useState(email);
+    const [newName, setName] = useState(name);
+    const [newPhoneNumber, setNewPhoneNumber] = useState(phoneNumber);
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const newPasswordConfirmIsOk = (newPasswordConfirm === '' &&  newPassword === '') || newPassword === newPasswordConfirm;
+    const [missOldPassword, setMissOldPassword] = useState(false);
+
+    async function UpdateProfile() {
+
+        if(!newPasswordConfirmIsOk)
+            return alert('New password and confirmation do not match.');
+        if(oldPassword === '')
+        {
+            setMissOldPassword(true);
+            return alert('Please enter your old password');
+        }
+        setMissOldPassword(false);
+
+        const profileData: {
+            UserName: string;
+            Email: string;
+            PhoneNumber: string;
+            Password?: string;
+            NewPassword?: string;
+        } = {
+            UserName: newName,
+            Email: newEmail,
+            PhoneNumber: newPhoneNumber,
+            Password : oldPassword
+        };
+
+        if (newPassword !== '') {
+            profileData.NewPassword = newPassword;
+        }
+
+        const result = await apiPut('/info', profileData);
+
+        if (result) {
+            alert('Profile updated successfully!');
+            checkUser();
+        }
+    }
+
+  
+  return (
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <ThemedText type="title" style={styles.title}>
+          User is logged in on {apiUrl}
+        </ThemedText>
+        <ThemedView type="backgroundElement" style={styles.stepContainer}>
+         
+            <ThemedText type="default">Email</ThemedText>
+            <TextInput
+                style={[styles.input, { color: theme['text'] }]}   
+                value={newEmail}
+                onChangeText={setEmail}
+            />
+
+            <ThemedText type="default">Name</ThemedText>
+            <TextInput
+                style={[styles.input, { color: theme['text'] }]}   
+                value={newName}
+                onChangeText={setName}
+            />
+
+            <ThemedText type="default">Phone Number</ThemedText>
+            <TextInput
+                style={[styles.input, { color: theme['text'] }]}   
+                value={newPhoneNumber}
+                onChangeText={setNewPhoneNumber}
+            />
+
+            <ThemedText type="default">New Password</ThemedText>
+            <TextInput
+                style={[styles.input, { color: theme['text'] }, { backgroundColor: newPasswordConfirmIsOk ? theme['backgroundElement'] : theme['red'] }]}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry={true}
+            />
+
+            <ThemedText type="default">Confirm New Password</ThemedText>
+            <TextInput
+                style={[styles.input, { color: theme['text'], backgroundColor: newPasswordConfirmIsOk ?  theme['backgroundElement'] : theme['red'] }]}
+                value={newPasswordConfirm}
+                onChangeText={setNewPasswordConfirm}
+                secureTextEntry={true}
+            />
+
+            <ThemedText type="default">Password</ThemedText>
+            <TextInput
+                style={[styles.input, { color: theme['text'] }, { backgroundColor: missOldPassword ? theme['red'] : theme['backgroundElement'] }]}
+                value={oldPassword}
+                onChangeText={setOldPassword}
+                secureTextEntry={true}
+            />
+
+
+            <View style={styles.buttonUpdate}>
+                <Button title="Update Profile" onPress={UpdateProfile} />
+            </View>
+            
+
+         
+        </ThemedView>
+      </SafeAreaView>
+    </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: Spacing.four,
+    alignItems: 'center',
+    gap: Spacing.three,
+    paddingBottom: BottomTabInset + Spacing.three,
+    maxWidth: MaxContentWidth,
+    paddingTop: Spacing.six,
+  },
+  heroSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    paddingHorizontal: Spacing.four,
+    gap: Spacing.four,
+  },
+  title: {
+    textAlign: 'center',
+  },
+  code: {
+    textTransform: 'uppercase',
+  },
+  stepContainer: {
+    gap: Spacing.two,
+    alignSelf: 'stretch',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.four,
+    borderRadius: Spacing.four,
+  },
+   input: {
+    height: 40,
+    borderWidth: 1,
+    padding: 10,
+  },
+  buttonUpdate: {
+    marginTop: Spacing.four,
+    borderRadius: 5,
+  },
+});

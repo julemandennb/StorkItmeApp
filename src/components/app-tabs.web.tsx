@@ -19,7 +19,7 @@ import { useAuth } from "@/context/AuthContext";
 
 
 export default function AppTabs() {
-  const { loggedIn, logout } = useAuth();
+  const { loggedIn } = useAuth();
 
 
   return (
@@ -39,9 +39,9 @@ export default function AppTabs() {
               <TabButton>Login</TabButton>
             </TabTrigger>
           ) : (
-            <TabButton onPress={logout}>
-              Logout
-            </TabButton>
+            <TabTrigger name="login" href="/profile" asChild>
+              <TabButton>Profile</TabButton>
+            </TabTrigger>
           )}
 
 

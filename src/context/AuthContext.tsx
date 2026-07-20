@@ -9,12 +9,21 @@ const AuthContext = createContext<any>(null);
 export function AuthProvider({ children }: any) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [userGroups, setUserGroups] = useState<{id: string, name: string,color: string}[]>([]);
+  const [StorkItmeGroups, setStorkItmeGroups] = useState<{id: string, name: string,description: string}[]>([]);
+
 
   async function checkUser() {
     try {
       const json = await apiGet("/info");
       setLoggedIn(!!(json && json.userName));
       setName(json?.userName || '');
+      setEmail(json?.email || '');
+      setPhoneNumber(json?.phoneNumber || '');
+      setUserGroups(json?.userGroups || []);
+      setStorkItmeGroups(json?.storkItmeGroups || []);
     } catch {
       setLoggedIn(false);
     }
@@ -28,6 +37,10 @@ export function AuthProvider({ children }: any) {
     await logoutService();
     setLoggedIn(false);
     setName('');
+    setEmail('');
+    setPhoneNumber('');
+    setUserGroups([]);
+    setStorkItmeGroups([]);
   }
 
   useEffect(() => {
@@ -39,6 +52,10 @@ export function AuthProvider({ children }: any) {
       value={{
         loggedIn,
         name,
+        email,
+        phoneNumber,
+        userGroups,
+        StorkItmeGroups,
         checkUser,
         loginSuccess,
         logout,

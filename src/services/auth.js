@@ -113,12 +113,10 @@ async function getInfo(key) {
 
 export async function logout() {
     if (Platform.OS === 'web') {
-        await AsyncStorage.removeItem(API_URL);
         await AsyncStorage.removeItem(ACCESS_TOKEN);
         await AsyncStorage.removeItem(REFRESH_TOKEN);
         await AsyncStorage.removeItem(EXPIRES_AT);
     } else { // mobile
-        await SecureStore.deleteItemAsync(API_URL);
         await SecureStore.deleteItemAsync(ACCESS_TOKEN);
         await SecureStore.deleteItemAsync(REFRESH_TOKEN);
         await SecureStore.deleteItemAsync(EXPIRES_AT);
