@@ -3,9 +3,10 @@ import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
+import { GetApiUrl } from '@/services/api';
 import { login } from '@/services/auth';
 import { router } from "expo-router";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,11 +14,31 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function LoginScreen() {
+  
   const [isLoading, setIsLoading] = useState(false);
+
     const [url, setUrl] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { loginSuccess,loggedIn, logout  } = useAuth();
+
+    useEffect(() => {
+      let mounted = true;
+
+      const loadApiUrl = async () => {
+        const apiUrl = await GetApiUrl();
+
+        if (mounted && apiUrl != null) {
+          setUrl(apiUrl);
+        }
+      };
+
+      loadApiUrl();
+
+      return () => {
+        mounted = false;
+      };
+    }, []);
 
     const handleLogin = async () => {
       if (isLoading) return; 

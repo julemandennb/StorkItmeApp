@@ -3,6 +3,8 @@
 import { apiGet } from "@/services/api";
 import { logout as logoutService } from "@/services/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+import { Alert, Platform } from 'react-native';
+
 
 const AuthContext = createContext<any>(null);
 
@@ -43,6 +45,32 @@ export function AuthProvider({ children }: any) {
     setStorkItmeGroups([]);
   }
 
+  function logoutAlert()
+  {
+    if(loggedIn)
+    {
+
+      if(Platform.OS === 'web')
+      {
+        if (confirm("are you sure you one to logout") == true) {
+          logout()
+        } 
+      }
+      else
+      {
+        Alert.alert('logout', 'are you sure you one to logout', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Yes', onPress: () => logout()},
+      
+        ]);
+      }
+    }
+  }
+
   useEffect(() => {
     checkUser();
   }, []);
@@ -59,6 +87,7 @@ export function AuthProvider({ children }: any) {
         checkUser,
         loginSuccess,
         logout,
+        logoutAlert,
       }}
     >
       {children}
@@ -75,3 +104,5 @@ export function useAuth() {
 
   return context;
 }
+
+

@@ -48,12 +48,17 @@ export async function getAccessToken() {
     await getInfo(EXPIRES_AT)
   );
 
+  const accessToken  = await getInfo(ACCESS_TOKEN);
+
+  if(accessToken   == null)
+    return null;
+
   // refresh if less than 60 seconds remaining
   if (Date.now() >= expiresAt - 60000) {
     await refreshAccessToken();
   }
 
-  return getInfo(ACCESS_TOKEN);
+  return accessToken 
 }
 
 export async function refreshAccessToken() {
