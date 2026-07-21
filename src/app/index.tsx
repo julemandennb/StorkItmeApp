@@ -1,61 +1,144 @@
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
+import { ThemedCheckbox } from '@/components/themed-checkbox';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { useTheme } from '@/hooks/use-theme';
+import { apiGet } from '@/services/api';
+import { router } from "expo-router";
+
+import { useEffect, useState } from 'react';
+import { Button, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+
 
 export default function HomeScreen() {
-    const { name } = useAuth();
+    const { name,loggedIn,hasIRightRole } = useAuth();
+        const theme = useTheme();
+    
+
+  const [storkItems,setStorkItems] = useState([]);
+  const [showUsergroup , setshowUsergroup] = useState(false);
+  const [showStorkItmeGroup , setshowStorkItmeGroup] = useState(false);
+
+  const columns = [
+    { key: "name", title: "Name" },
+    { key: "type", title: "Type" },
+    { key: "bestBy", title: "Best By" },
+    { key: "description", title: "Description" },
+    { key: "stork", title: "Stock" },
+    { key: "storeLocation", title: "Location" },
+    { key: "itemNumber", title: "Item No" },
+    { key: "ean", title: "EAN" },
+  ];
+
+    const loadStorkitmesApi = async ( 
+      usergroup = showUsergroup,
+      storkItmeGroup = showStorkItmeGroup
+    ) => {
+
+      let url = '/storkitme/GetAll?GetFromUsergroup='+usergroup+'&GetFromStorkItmeGroup='+storkItmeGroup;
+
+      const storkitmesApi = await apiGet(url);
+      setStorkItems(storkitmesApi);
+    };
+
+    useEffect(() => {
+      let mounted = true;
+      loadStorkitmesApi();
+      return () => {
+        mounted = false;
+      };
+    }, [showUsergroup, showStorkItmeGroup,loggedIn]);
+
+  const renderRow = ({ item }) => (
+    <Pressable onPress={() => router.push(`/storkItem/${item.uuid}`)}>
+      <View style={[styles.row, {backgroundColor: item.stork <= 0 ? theme['red'] : ""  }]}>
+        {columns.map((column) => {
+          let val = item[column.key];
+
+          if (column.key === "bestBy" && val) {
+            const date = new Date(val);
+            val = `${String(date.getDate()).padStart(2, "0")}/${String(
+              date.getMonth() + 1
+            ).padStart(2, "0")}/${date.getFullYear()}`;
+          }
+          return (
+            
+              <ThemedText
+                type="default"
+                key={column.key}
+                style={styles.cell}
+              >
+                {val ?? "-"}
+              </ThemedText>
+            
+          );
+        })}
+      </View>
+    </Pressable>
+  );
+
   
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            {name ? `Welcome ${name}` : 'Welcome to Expo'}
+            {name ? `Welcome ${name}` : 'Welcome to StorkItmeApp'}
           </ThemedText>
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started dddd
-        </ThemedText>
-
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editingdddd"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
+        <View style={{ flex: 1, width: "100%" }}>
+  <ScrollView
+    horizontal
+    showsHorizontalScrollIndicator
+  >
+    <View style={styles.table}>
+
+      <View style={styles.buttonContainer} >
+        <View style={[{display: !(loggedIn && hasIRightRole("Member")) ? "none" : "flex", marginBottom: Spacing.three}]}>
+          <Button
+            title="Make a new storkItem"
+            onPress={() => {
+              router.push(`/storkItem/create`)
+            }}
+        />
+        </View>
+
+        <View style={[{display: !(loggedIn) ? "none" : "flex",marginBottom: Spacing.three}]}>
+               <ThemedCheckbox label="Show only from Usergroup" value={showUsergroup}  onValueChange={setshowUsergroup} />
+        </View>
+
+        <View style={[{display: !(loggedIn) ? "none" : "flex" }]}>
+          <ThemedCheckbox label="Show only from StorkItmeGroup"  value={showStorkItmeGroup} onValueChange={setshowStorkItmeGroup} />
+
+        </View>
+      
+      </View>
+
+      <View style={[styles.row, styles.header]}>
+        {columns.map((column) => (
+          <Text key={column.key} style={styles.headerCell}>
+            {column.title}
+          </Text>
+        ))}
+      </View>
+
+      <FlatList
+        data={storkItems}
+        keyExtractor={(item) => item.uuid}
+        renderItem={renderRow}
+        style={{ flex: 1 }}
+      />
+
+    </View>
+  </ScrollView>
+</View>
         </ThemedView>
 
         {Platform.OS === 'web' && <WebBadge />}
@@ -82,9 +165,7 @@ const styles = StyleSheet.create({
   heroSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
     paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
   },
   title: {
     textAlign: 'center',
@@ -93,10 +174,43 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   stepContainer: {
-    gap: Spacing.three,
+     gap: Spacing.three,
     alignSelf: 'stretch',
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
+    flex: 1,
+  },
+
+   table: {
+    minWidth: 900,
+    margin: 10,
+  },
+
+  row: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+  },
+
+  cell: {
+    width: 120,
+    padding: 10,
+    fontSize: 14,
+  },
+
+  header: {
+    backgroundColor: "#f2f2f2",
+  },
+
+  headerCell: {
+    width: 120,
+    padding: 10,
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  buttonContainer: {
+    alignItems: 'flex-start',
+    marginBottom: Spacing.four
   },
 });
