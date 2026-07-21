@@ -1,3 +1,4 @@
+import { ThemedCheckbox } from '@/components/themed-checkbox';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
@@ -8,18 +9,20 @@ import { apiGet } from '@/services/api';
 import { router } from "expo-router";
 
 import { useEffect, useState } from 'react';
-import { FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
 
 export default function HomeScreen() {
-    const { name,loggedIn } = useAuth();
+    const { name,loggedIn,hasIRightRole } = useAuth();
         const theme = useTheme();
     
 
-  const [storkItems,setStorkItems] = useState([]); 
+  const [storkItems,setStorkItems] = useState([]);
+  const [showUsergroup , setshowUsergroup] = useState(false);
+  const [showStorkItmeGroup , setshowStorkItmeGroup] = useState(false);
 
   const columns = [
     { key: "name", title: "Name" },
@@ -32,20 +35,24 @@ export default function HomeScreen() {
     { key: "ean", title: "EAN" },
   ];
 
+    const loadStorkitmesApi = async ( 
+      usergroup = showUsergroup,
+      storkItmeGroup = showStorkItmeGroup
+    ) => {
+
+      let url = '/storkitme/GetAll?GetFromUsergroup='+usergroup+'&GetFromStorkItmeGroup='+storkItmeGroup;
+
+      const storkitmesApi = await apiGet(url);
+      setStorkItems(storkitmesApi);
+    };
+
     useEffect(() => {
       let mounted = true;
-
-      const loadStorkitmesApi = async () => {
-        const storkitmesApi = await apiGet('/storkitme/GetAll');
-        setStorkItems(storkitmesApi);
-      };
-
       loadStorkitmesApi();
-
       return () => {
         mounted = false;
       };
-    }, []);
+    }, [showUsergroup, showStorkItmeGroup,loggedIn]);
 
   const renderRow = ({ item }) => (
     <Pressable onPress={() => router.push(`/storkItem/${item.uuid}`)}>
@@ -92,6 +99,27 @@ export default function HomeScreen() {
     showsHorizontalScrollIndicator
   >
     <View style={styles.table}>
+
+      <View style={styles.buttonContainer} >
+        <View style={[{display: !(loggedIn && hasIRightRole("Member")) ? "none" : "flex", marginBottom: Spacing.three}]}>
+          <Button
+            title="Make a new storkItem"
+            onPress={() => {
+              router.push(`/storkItem/create`)
+            }}
+        />
+        </View>
+
+        <View style={[{display: !(loggedIn) ? "none" : "flex",marginBottom: Spacing.three}]}>
+               <ThemedCheckbox label="Show only from Usergroup" value={showUsergroup}  onValueChange={setshowUsergroup} />
+        </View>
+
+        <View style={[{display: !(loggedIn) ? "none" : "flex" }]}>
+          <ThemedCheckbox label="Show only from StorkItmeGroup"  value={showStorkItmeGroup} onValueChange={setshowStorkItmeGroup} />
+
+        </View>
+      
+      </View>
 
       <View style={[styles.row, styles.header]}>
         {columns.map((column) => (
@@ -180,5 +208,9 @@ const styles = StyleSheet.create({
     padding: 10,
     fontWeight: "700",
     fontSize: 14,
+  },
+  buttonContainer: {
+    alignItems: 'flex-start',
+    marginBottom: Spacing.four
   },
 });

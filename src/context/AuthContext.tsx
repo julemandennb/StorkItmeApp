@@ -9,10 +9,14 @@ import { Alert, Platform } from 'react-native';
 const AuthContext = createContext<any>(null);
 
 export function AuthProvider({ children }: any) {
+
+  const roleHierarchy = ["Read","Member", "Manager", "Admin"];
+
   const [loggedIn, setLoggedIn] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [role, setRole] = useState<{displayName: string, name: string}>({displayName:"Read",name:"Read"});
   const [userGroups, setUserGroups] = useState<{id: string, name: string,color: string}[]>([]);
   const [StorkItmeGroups, setStorkItmeGroups] = useState<{id: string, name: string,description: string}[]>([]);
 
@@ -26,6 +30,7 @@ export function AuthProvider({ children }: any) {
       setPhoneNumber(json?.phoneNumber || '');
       setUserGroups(json?.userGroups || []);
       setStorkItmeGroups(json?.storkItmeGroups || []);
+      setRole(json.role)
     } catch {
       setLoggedIn(false);
     }
@@ -71,6 +76,21 @@ export function AuthProvider({ children }: any) {
     }
   }
 
+  function hasIRightRole(roleToHave:string):boolean
+  {
+    const requiredRoleIndex = roleHierarchy.indexOf(roleToHave);
+    const userRoleIndex = roleHierarchy.indexOf(role.name);
+
+    // Invalid roles
+    if (requiredRoleIndex === -1 || userRoleIndex === -1) {
+      return false;
+    }
+    
+    // User can access the role if their role is equal or higher in hierarchy
+    return userRoleIndex >= requiredRoleIndex;
+
+  }
+
   useEffect(() => {
     checkUser();
   }, []);
@@ -88,6 +108,7 @@ export function AuthProvider({ children }: any) {
         loginSuccess,
         logout,
         logoutAlert,
+        hasIRightRole,
       }}
     >
       {children}
