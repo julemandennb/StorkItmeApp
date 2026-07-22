@@ -1,3 +1,4 @@
+import { DatePickerField } from '@/components/date-picker-field';
 import { TextInputWithLabel } from '@/components/TextInputWithLabel';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,8 +10,6 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-
 
 export default function StorkitmeCreate() {
 
@@ -26,7 +25,7 @@ export default function StorkitmeCreate() {
     const [name,setName]= useState('');
     const [description,setDescription]= useState('');
     const [type,setType]= useState('');
-    const [bestBy,setBestBy]= useState(''); // this is a dato
+    const [bestBy,setBestBy]= useState('');
     const [stork,setStork]= useState('0'); // this is a number
     const [userGroupId,setUserGroupId]= useState(''); //this is a uuid from usergroups
     const [storkItmeGroupId,setStorkItmeGroupId]= useState(''); //this is a uuid from storkitmegroups
@@ -112,8 +111,12 @@ export default function StorkitmeCreate() {
             onChangeText={setType}
           />
 
-//fefwfwef
-   
+          <DatePickerField
+            labelText="Best by"
+            value={bestBy}
+            onChange={setBestBy}
+            style={styles.input}
+          />
 
           <TextInputWithLabel
             labelText="Stork"
@@ -172,10 +175,22 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
   },
-   input: {
+  input: {
     height: 40,
     borderWidth: 1,
     padding: 10,
+  },
+  fieldGroup: {
+    gap: Spacing.one,
+  },
+  pickerButton: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    justifyContent: 'center',
+  },
+  pickerText: {
   },
   buttonUpdate: {
     marginTop: Spacing.four,
