@@ -1,5 +1,5 @@
 import { DatePickerField } from '@/components/date-picker-field';
-import { TextInputWithLabel } from '@/components/TextInputWithLabel';
+import { TextInputWithLabel } from '@/components/text-input-with-label';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -27,11 +27,11 @@ export default function StorkitmeCreate() {
     const [type,setType]= useState('');
     const [bestBy,setBestBy]= useState('');
     const [stork,setStork]= useState('0'); // this is a number
-    const [userGroupId,setUserGroupId]= useState(''); //this is a uuid from usergroups
-    const [storkItmeGroupId,setStorkItmeGroupId]= useState(''); //this is a uuid from storkitmegroups
     const [storeLocation,setStoreLocation]= useState('');
     const [itemNumber,setItemNumber]= useState('');
     const [ean,setEan]= useState('');
+    const [userGroupId,setUserGroupId]= useState(''); //this is a uuid from usergroups
+    const [storkItmeGroupId,setStorkItmeGroupId]= useState(''); //this is a uuid from storkitmegroups
 
 
 
@@ -125,6 +125,30 @@ export default function StorkitmeCreate() {
             value={stork}
             onChangeText={setStork}
             inputMode="numeric"
+          />
+
+          <TextInputWithLabel
+            labelText="Store location"
+            labelType="default"
+            style={[styles.input, { color: theme['text'] }]}
+            value={storeLocation}
+            onChangeText={setStoreLocation}
+          />
+
+          <TextInputWithLabel
+            labelText="Item number"
+            labelType="default"
+            style={[styles.input, { color: theme['text'] }]}
+            value={itemNumber}
+            onChangeText={setItemNumber}
+          />
+
+          <TextInputWithLabel
+            labelText="Ean number"
+            labelType="default"
+            style={[styles.input, { color: theme['text'] }]}
+            value={ean}
+            onChangeText={setEan}
           />
 
 
