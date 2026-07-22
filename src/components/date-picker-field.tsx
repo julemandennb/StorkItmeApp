@@ -52,6 +52,33 @@ export function DatePickerField({
     }
   };
 
+  if (Platform.OS === 'web') {
+    return (
+      <View style={[styles.container, containerStyle]}>
+        <ThemedText type={labelType}>{labelText}</ThemedText>
+        <input
+          type="date"
+          value={value}
+          disabled={disabled}
+          onChange={(event) => onChange(event.target.value)}
+          style={{
+            height: 40,
+            borderWidth: 1,
+            borderColor: "black",
+            borderRadius: 8,
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingTop: 8,
+            paddingBottom: 8,
+            backgroundColor: 'transparent',
+            color: theme['text'],
+            ...(style as Record<string, unknown>),
+          }}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, containerStyle]}>
       <ThemedText type={labelType}>{labelText}</ThemedText>
@@ -73,9 +100,6 @@ export function DatePickerField({
           onValueChange={handleDateChange}
         />
       )}
-
-
-
     </View>
   );
 }
