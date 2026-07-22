@@ -42,11 +42,6 @@ export default function AppTabs() {
           )}
 
 
-
-          <TabTrigger name="/storkitme-create" href="/storkitme/create" asChild>
-          </TabTrigger>
-
-
         </CustomTabList>
       </TabList>
     </Tabs>

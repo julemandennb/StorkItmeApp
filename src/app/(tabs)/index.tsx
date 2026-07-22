@@ -6,7 +6,7 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
 import { apiGet } from '@/services/api';
-import { router } from "expo-router";
+import { Link, useRouter } from 'expo-router';
 
 import { useEffect, useState } from 'react';
 import { Button, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function HomeScreen() {
     const { name,loggedIn,hasIRightRole } = useAuth();
         const theme = useTheme();
+  const router = useRouter();
     
 
   const [storkItems,setStorkItems] = useState([]);
@@ -102,12 +103,12 @@ export default function HomeScreen() {
 
       <View style={styles.buttonContainer} >
         <View style={[{display: !(loggedIn && hasIRightRole("Member")) ? "none" : "flex", marginBottom: Spacing.three}]}>
-          <Button
-            title="Make a new storkItem"
-            onPress={() => {
-              router.push(`/storkitme/create`)
-            }}
-        />
+          <Link href="/storkitme/create" asChild>
+            <Button
+              title="Make a new storkItem"
+              onPress={() => { console.log('create pressed (link)'); }}
+            />
+          </Link>
         </View>
 
         <View style={[{display: !(loggedIn) ? "none" : "flex",marginBottom: Spacing.three}]}>
