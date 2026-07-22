@@ -70,9 +70,12 @@ export function DatePickerField({
           value={selectedDate ?? new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleDateChange}
+          onValueChange={handleDateChange}
         />
       )}
+
+
+
     </View>
   );
 }
