@@ -1,13 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { storeGetInfo } from './StorageSystem';
 import { getAccessToken } from './auth';
 
 export async function apiGet(path) {
   
   try
   {
-    const apiUrl = await getInfo('apiUrl');
+    const apiUrl = await storeGetInfo('apiUrl');
     if (!apiUrl) {
       return null;
     }
@@ -37,7 +35,7 @@ export async function apiGet(path) {
 
 export async function apiPost(path, data) {
   try {
-    const apiUrl = await getInfo('apiUrl');
+    const apiUrl = await storeGetInfo('apiUrl');
 
     const accessToken = await getAccessToken();
 
@@ -72,7 +70,7 @@ export async function apiPost(path, data) {
 
 export async function apiPut(path, data) {
   try {
-    const apiUrl = await getInfo('apiUrl');
+    const apiUrl = await storeGetInfo('apiUrl');
     const accessToken = await getAccessToken();
 
     if (!apiUrl) {
@@ -101,20 +99,6 @@ export async function apiPut(path, data) {
 }
 
 export async function GetApiUrl() {
-  const apiUrl = await getInfo('apiUrl');
+  const apiUrl = await storeGetInfo('apiUrl');
   return apiUrl;
-}
-
-async function getInfo(key) {
-    try {
-        if (Platform.OS === 'web') {
-            return await AsyncStorage.getItem(key);
-        }
-        else { // mobile
-            return await SecureStore.getItemAsync(key);
-        }
-    } catch (error) {
-        console.error("Error retrieving data:", error);
-        return null;
-    }
 }

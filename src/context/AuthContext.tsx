@@ -85,11 +85,11 @@ export function AuthProvider({ children }: any) {
     if (requiredRoleIndex === -1 || userRoleIndex === -1) {
       return false;
     }
-    
     // User can access the role if their role is equal or higher in hierarchy
     return userRoleIndex >= requiredRoleIndex;
-
   }
+
+  
 
   useEffect(() => {
     checkUser();
