@@ -78,6 +78,7 @@ export async function refreshAccessToken() {
   });
 
   if (!response.ok) {
+    console.log("error refreshAccessToken" , response)
     throw new Error('Token refresh failed');
   }
 

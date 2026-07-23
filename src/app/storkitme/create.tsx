@@ -1,39 +1,40 @@
 import { DatePickerField } from '@/components/date-picker-field';
+import { PickerInputLabel } from '@/components/picker-input-label';
 import { TextInputWithLabel } from '@/components/text-input-with-label';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
-import { apiGet } from '@/services/api';
+import { apiGet, apiPost } from '@/services/api';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { Button, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function StorkitmeCreate() {
 
     const { loggedIn } = useAuth();
     const theme = useTheme();
 
-    const [storkitmegroups , setStorkitmegroup] = useState([]);
 
+    const [storkitmegroups , setStorkitmegroup] = useState([]);
     const [usergroups , setUsergroup] = useState([]);
 
+    const [saving, setSaving] = useState(false);
 
     //to make a new storkitme
     const [name,setName]= useState('');
     const [description,setDescription]= useState('');
     const [type,setType]= useState('');
-    const [bestBy,setBestBy]= useState('');
-    const [stork,setStork]= useState('0'); // this is a number
+    const [bestBy, setBestBy] = useState(new Date().toISOString().split("T")[0]);
+    const [stork,setStork]= useState(0); // this is a number
     const [storeLocation,setStoreLocation]= useState('');
     const [itemNumber,setItemNumber]= useState('');
     const [ean,setEan]= useState('');
     const [userGroupId,setUserGroupId]= useState(''); //this is a uuid from usergroups
     const [storkItmeGroupId,setStorkItmeGroupId]= useState(''); //this is a uuid from storkitmegroups
-
-
 
     const loadusergroup = async () =>
     {
@@ -73,14 +74,70 @@ export default function StorkitmeCreate() {
       }, [loggedIn])
     );
 
+    function nullSet(){
+      setName('');
+      setDescription('');
+      setType('');
+      setBestBy(new Date().toISOString().split("T")[0]);
+      setStork(0);
+      setStoreLocation('');
+      setItemNumber('');
+      setEan('');
+      setUserGroupId(''); 
+      setStorkItmeGroupId('');
 
+    }
+
+    async function makeNewStorkitme() {
+      setSaving(true);
+
+      try {
+        if(!loggedIn)
+        {
+          alert("you ar not login")
+          return
+        }
+
+        if(name.length === 0)
+          {
+          alert("this has to hav a name")
+          return
+        }
+
+        
+        const newStorkItme = {
+          name,
+          description,
+          type,
+          bestBy,
+          stork: stork,
+          storeLocation,
+          itemNumber,
+          ean,
+          userGroupId,
+          storkItmeGroupId,
+        };
+
+        const res = await apiPost('/storkitme/Create',newStorkItme)
+
+        nullSet();
+ 
+      } 
+      catch
+      {
+
+      }
+      finally {
+        setSaving(false);
+      }
+    }
 
 
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-
+        <ScrollView>
           <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
             Create a new storkitme
           </ThemedText>
@@ -122,8 +179,8 @@ export default function StorkitmeCreate() {
             labelText="Stork"
             labelType="default"
             style={[styles.input, { color: theme['text'] }]}
-            value={stork}
-            onChangeText={setStork}
+            value={String(stork)}
+            onChangeText={(v)=>setStork(Number(v))}
             inputMode="numeric"
           />
 
@@ -151,14 +208,45 @@ export default function StorkitmeCreate() {
             onChangeText={setEan}
           />
 
+          <PickerInputLabel
+            labelText="Usergroup"
+            labelType="default"
+            showDefault
+            defaultValue=''
+            datakey="uuid"
+            datalabel="name"
+            datavalue="uuid"
+            data={usergroups}
+            selectedValue={userGroupId}
+            onValueChange={setUserGroupId}
+            style={[styles.inputPicker,{color: theme['text'] , backgroundColor: theme['backgroundElement'] }]}
+          />
+
+          <PickerInputLabel
+            labelText="StorkItmeGroup"
+            labelType="default"
+            showDefault
+            defaultValue=''
+            datakey="uuid"
+            datalabel="name"
+            datavalue="uuid"
+            data={storkitmegroups}
+            selectedValue={storkItmeGroupId}
+            onValueChange={setStorkItmeGroupId}
+            style={[styles.inputPicker,{color: theme['text'] , backgroundColor: theme['backgroundElement'] }]}
+          />
+
+          <View style={styles.buttonUpdate}>
+              <Button 
+                title={saving ? "Creating..." : "Make new StorkItme"}
+                disabled={saving}
+                onPress={makeNewStorkitme}
+              />
+          </View>
 
 
-
-
-
-             
-          </ThemedView>
-
+        </ThemedView>
+        </ScrollView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -177,7 +265,7 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
-    paddingTop: Spacing.six,
+    paddingTop: Spacing.three,
   },
   heroSection: {
     alignItems: 'center',
@@ -204,17 +292,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  inputPicker: {
+    height: 50,
+    borderWidth: 1,
+    padding: 10,
+  },
   fieldGroup: {
     gap: Spacing.one,
-  },
-  pickerButton: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    justifyContent: 'center',
-  },
-  pickerText: {
   },
   buttonUpdate: {
     marginTop: Spacing.four,
