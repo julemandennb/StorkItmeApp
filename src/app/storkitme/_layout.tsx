@@ -10,7 +10,9 @@ export default function StorkitmeLayout() {
       <AuthProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <AnimatedSplashOverlay />
-          <Stack />
+          <Stack>
+            <Stack.Screen name="[id]" options={{ headerTitle:"Opdate storkitme"}} />
+        </Stack>
         </ThemeProvider>
       </AuthProvider>
     );

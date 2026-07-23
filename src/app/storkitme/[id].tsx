@@ -3,8 +3,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import { apiGet, apiPost } from '@/services/api';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useTheme } from '@/hooks/use-theme';
+import { apiGet, apiPut } from '@/services/api';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,7 +16,14 @@ export default function StorkitmeCreate() {
 
     const { loggedIn,hasIRightRole } = useAuth();
     const router = useRouter();
+    
 
+
+    const theme = useTheme();
+
+    const { id } = useLocalSearchParams();
+
+    const [storkitme , setStorkitme] = useState(null);
 
     const [storkitmegroups , setStorkitmegroup] = useState([]);
     const [usergroups , setUsergroup] = useState([]);
@@ -47,6 +55,33 @@ export default function StorkitmeCreate() {
 
     }
 
+    const loadstorkitme = async () =>
+    {
+        if(loggedIn)
+        {
+            let url = '/storkitme/Get?uuid='+id
+            const storkitmeApi = await apiGet(url);
+
+            const formData = {
+                name: storkitmeApi.name ?? '',
+                description: storkitmeApi.description ?? '',
+                type: storkitmeApi.type ?? '',
+                bestBy: storkitmeApi.bestBy ?? '',
+                stork: storkitmeApi.stork ?? 0,
+                storeLocation: storkitmeApi.storeLocation ?? '',
+                itemNumber: storkitmeApi.itemNumber ?? '',
+                ean: storkitmeApi.ean ?? '',
+
+                userGroupId: storkitmeApi.userGroup?.uuid ?? '',
+                storkItmeGroupId: storkitmeApi.storkItmeGroup?.uuid ?? '',
+            };
+
+            setStorkitme(formData);
+        }
+        else
+           setStorkitme(null);
+    }
+
     useFocusEffect(
       useCallback(() => {
 
@@ -55,18 +90,22 @@ export default function StorkitmeCreate() {
           router.push(`/`);
         }
 
+
         if (!loggedIn) {
           setStorkitmegroup([]);
           setUsergroup([]);
+          setStorkitme(null);
           return;
         }
+        
         loadusergroup();
         loadStorkitmegroup();
+        loadstorkitme();
 
-      }, [loggedIn])
+      }, [loggedIn, id])
     );
 
-    async function makeNewStorkitme(data:any) {
+    async function updateStorkitme(data:any) {
       setSaving(true);
 
       try {
@@ -76,11 +115,11 @@ export default function StorkitmeCreate() {
           return false;
         }
 
+        let url = "/storkitme/"+id
+        const res = await apiPut(url,data)
        
 
-        const res = await apiPost('/storkitme/Create',data)
-
-        return true;
+        return false;
       } 
       catch
       {
@@ -97,23 +136,19 @@ export default function StorkitmeCreate() {
 
 <ThemedView style={styles.container}>
 <SafeAreaView style={styles.safeArea}>
- <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
-            Create a new storkitme
-          </ThemedText>
+    <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
+        update a storkitme
+        </ThemedText>
 
 
 
-      <StorkitmeForm
-    
+    <StorkitmeForm
+        initialValues={storkitme}
         usergroups={usergroups}
-
         storkitmegroups={storkitmegroups}
-
-        onSubmit={makeNewStorkitme}
-
-        buttonText="Make new StorkItme"
-
-      />
+        onSubmit={updateStorkitme}
+        buttonText="Update StorkItme"
+    />
 </SafeAreaView>
 </ThemedView>
   )

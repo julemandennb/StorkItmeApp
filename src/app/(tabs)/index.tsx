@@ -56,7 +56,7 @@ export default function HomeScreen() {
     }, [showUsergroup, showStorkItmeGroup,loggedIn]);
 
   const renderRow = ({ item }) => (
-    <Pressable onPress={() => router.push(`/storkitem/${item.uuid}`)}>
+    <Pressable onPress={() => router.push(`/storkitme/${item.uuid}`)}>
       <View style={[styles.row, {backgroundColor: item.stork <= 0 ? theme['red'] : ""  }]}>
         {columns.map((column) => {
           let val = item[column.key];
