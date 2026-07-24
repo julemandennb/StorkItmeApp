@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
-import { apiGet, apiPut } from '@/services/api';
+import { apiDelete, apiGet, apiPut } from '@/services/api';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
@@ -85,12 +85,6 @@ export default function StorkitmeCreate() {
     useFocusEffect(
       useCallback(() => {
 
-        if((!loggedIn && !hasIRightRole("Member")))
-        {
-          router.push(`/`);
-        }
-
-
         if (!loggedIn) {
           setStorkitmegroup([]);
           setUsergroup([]);
@@ -130,6 +124,18 @@ export default function StorkitmeCreate() {
       }
     }
 
+    async function onDelete()
+    {
+
+      let url = "/storkitme/Delete?uuid="+id
+      const res = await apiDelete(url)
+
+      router.push(`/`);
+       
+
+
+      return true;
+    }
 
 
  return (
@@ -143,10 +149,12 @@ export default function StorkitmeCreate() {
 
 
     <StorkitmeForm
+        thisIsToUpdate
         initialValues={storkitme}
         usergroups={usergroups}
         storkitmegroups={storkitmegroups}
         onSubmit={updateStorkitme}
+        onDelete={onDelete}
         buttonText="Update StorkItme"
     />
 </SafeAreaView>

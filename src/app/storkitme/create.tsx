@@ -50,12 +50,8 @@ export default function StorkitmeCreate() {
     useFocusEffect(
       useCallback(() => {
 
-        if((!loggedIn && !hasIRightRole("Member")))
-        {
-          router.push(`/`);
-        }
-
         if (!loggedIn) {
+
           setStorkitmegroup([]);
           setUsergroup([]);
           return;

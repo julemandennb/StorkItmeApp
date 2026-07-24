@@ -6,14 +6,13 @@ export async function apiGet(path) {
   try
   {
     const apiUrl = await storeGetInfo('apiUrl');
-    if (!apiUrl) {
-      return null;
-    }
-    
     const accessToken = await getAccessToken();
-    if (!accessToken) {
+
+    if (!checkLogin(apiUrl,accessToken)) {
       return null;
     }
+
+
     
     const response = await fetch(`${apiUrl}${path}`, {
       headers: {
@@ -36,16 +35,12 @@ export async function apiGet(path) {
 export async function apiPost(path, data) {
   try {
     const apiUrl = await storeGetInfo('apiUrl');
-
     const accessToken = await getAccessToken();
 
-    if (!apiUrl) {
+   if (!checkLogin(apiUrl,accessToken)) {
       return null;
     }
 
-    if (!accessToken) {
-      return null;
-    }
 
     const response = await fetch(`${apiUrl}${path}`, {
       method: 'POST',
@@ -73,12 +68,10 @@ export async function apiPut(path, data) {
     const apiUrl = await storeGetInfo('apiUrl');
     const accessToken = await getAccessToken();
 
-    if (!apiUrl) {
+    if (!checkLogin(apiUrl,accessToken)) {
       return null;
     }
-    if (!accessToken) {
-      return null;
-    }
+
 
     const response = await fetch(`${apiUrl}${path}`, {
       method: 'PUT',
@@ -98,7 +91,51 @@ export async function apiPut(path, data) {
   }
 }
 
+export async function apiDelete(path)
+{
+  try {
+    const apiUrl = await storeGetInfo('apiUrl');
+    const accessToken = await getAccessToken();
+
+    if (!checkLogin(apiUrl,accessToken)) {
+      return null;
+    }
+
+    const response = await fetch(`${apiUrl}${path}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }
+    }); 
+
+    if (!response.ok) {
+      throw new Error(`API Error ${response.status}`);
+    }
+    return response;
+
+  } catch (error) {
+    console.error('API PUT error:', error);
+    return null;
+  }
+
+}
+
 export async function GetApiUrl() {
   const apiUrl = await storeGetInfo('apiUrl');
   return apiUrl;
+}
+
+
+
+async function checkLogin(apiUrl,accessToken)
+{
+    if (!apiUrl) {
+      return false;
+    }
+    if (!accessToken) {
+      return false;
+    }
+
+    return true;
 }

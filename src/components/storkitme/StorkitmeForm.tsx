@@ -3,6 +3,7 @@ import { PickerInputLabel } from '@/components/picker-input-label';
 import { TextInputWithLabel } from '@/components/text-input-with-label';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing, } from '@/constants/theme';
+import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
 import { useEffect, useState } from 'react';
 import { Button, ScrollView, StyleSheet, View } from 'react-native';
@@ -29,9 +30,11 @@ type Props = {
   storkitmegroups: any[];
 
   onSubmit: (data: StorkitmeData) => boolean;
+  onDelete?: () => boolean;
 
   buttonText?: string;
   loading?: boolean;
+  thisIsToUpdate?:boolean
 };
 
 
@@ -54,9 +57,14 @@ export function StorkitmeForm({
   usergroups,
   storkitmegroups,
   onSubmit,
+  onDelete,
   buttonText="Save",
-  loading=false
+  loading=false,
+  thisIsToUpdate=false
+
 }: Props) {
+
+  const {hasIRightRole } = useAuth();
 
 
 const theme = useTheme();
@@ -106,6 +114,10 @@ async function submit(){
 
   if(res)
     nullSet();
+}
+
+async function deleteFun() {
+  await onDelete?.();
 }
 
 useEffect(() => {
@@ -225,14 +237,32 @@ return (
 />
 
 
+{(hasIRightRole('Member')) && (
+  <View style={styles.buttonUpdate}>
+    <Button
+    title={loading ? "Saving..." : buttonText}
+    disabled={loading}
+    onPress={submit}
+    />
+  </View>
+  )}
 
-<View style={styles.buttonUpdate}>
-<Button
- title={loading ? "Saving..." : buttonText}
- disabled={loading}
- onPress={submit}
-/>
-</View>
+
+ {(thisIsToUpdate && hasIRightRole('Manager')) && (
+         
+  <View style={styles.buttonUpdate}>
+
+    <Button
+      color={theme['red']}
+      title={"Delete"}
+      onPress={deleteFun}
+    />
+  </View>
+  )}
+
+
+
+
 </ThemedView>
  </ScrollView>
 
