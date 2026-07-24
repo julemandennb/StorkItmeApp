@@ -1,21 +1,18 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { storeGetInfo } from './StorageSystem';
 import { getAccessToken } from './auth';
 
 export async function apiGet(path) {
   
   try
   {
-    const apiUrl = await getInfo('apiUrl');
-    if (!apiUrl) {
-      return null;
-    }
-    
+    const apiUrl = await storeGetInfo('apiUrl');
     const accessToken = await getAccessToken();
-    if (!accessToken) {
+
+    if (!checkLogin(apiUrl,accessToken)) {
       return null;
     }
+
+
     
     const response = await fetch(`${apiUrl}${path}`, {
       headers: {
@@ -37,17 +34,13 @@ export async function apiGet(path) {
 
 export async function apiPost(path, data) {
   try {
-    const apiUrl = await getInfo('apiUrl');
-
+    const apiUrl = await storeGetInfo('apiUrl');
     const accessToken = await getAccessToken();
 
-    if (!apiUrl) {
+   if (!checkLogin(apiUrl,accessToken)) {
       return null;
     }
 
-    if (!accessToken) {
-      return null;
-    }
 
     const response = await fetch(`${apiUrl}${path}`, {
       method: 'POST',
@@ -72,15 +65,13 @@ export async function apiPost(path, data) {
 
 export async function apiPut(path, data) {
   try {
-    const apiUrl = await getInfo('apiUrl');
+    const apiUrl = await storeGetInfo('apiUrl');
     const accessToken = await getAccessToken();
 
-    if (!apiUrl) {
+    if (!checkLogin(apiUrl,accessToken)) {
       return null;
     }
-    if (!accessToken) {
-      return null;
-    }
+
 
     const response = await fetch(`${apiUrl}${path}`, {
       method: 'PUT',
@@ -100,21 +91,51 @@ export async function apiPut(path, data) {
   }
 }
 
+export async function apiDelete(path)
+{
+  try {
+    const apiUrl = await storeGetInfo('apiUrl');
+    const accessToken = await getAccessToken();
+
+    if (!checkLogin(apiUrl,accessToken)) {
+      return null;
+    }
+
+    const response = await fetch(`${apiUrl}${path}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      }
+    }); 
+
+    if (!response.ok) {
+      throw new Error(`API Error ${response.status}`);
+    }
+    return response;
+
+  } catch (error) {
+    console.error('API PUT error:', error);
+    return null;
+  }
+
+}
+
 export async function GetApiUrl() {
-  const apiUrl = await getInfo('apiUrl');
+  const apiUrl = await storeGetInfo('apiUrl');
   return apiUrl;
 }
 
-async function getInfo(key) {
-    try {
-        if (Platform.OS === 'web') {
-            return await AsyncStorage.getItem(key);
-        }
-        else { // mobile
-            return await SecureStore.getItemAsync(key);
-        }
-    } catch (error) {
-        console.error("Error retrieving data:", error);
-        return null;
+
+
+async function checkLogin(apiUrl,accessToken)
+{
+    if (!apiUrl) {
+      return false;
     }
+    if (!accessToken) {
+      return false;
+    }
+
+    return true;
 }
