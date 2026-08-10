@@ -1,4 +1,5 @@
 import { TextInputWithLabel } from '@/components/text-input-with-label';
+import { ThemeColorPicker } from '@/components/themed-color-picker';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing, } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -30,7 +31,7 @@ type Props = {
 
 const emptyValues: UsergroupData = {
   name:'',
-  color:'',
+  color:'#ffffff',
 };
 
 
@@ -120,6 +121,13 @@ return (
  style={[styles.input,{color:theme.text}]}
  value={form.color}
  onChangeText={(v)=>update("color",v)}
+/>
+
+<ThemeColorPicker
+  resultColorOn={form.color}
+  onColorPick={(color)=>{
+    update("color",color);
+  }}
 />
 
 
