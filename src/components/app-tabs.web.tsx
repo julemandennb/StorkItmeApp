@@ -36,9 +36,15 @@ export default function AppTabs() {
               <TabButton>Login</TabButton>
             </TabTrigger>
           ) : (
+            <>
+            <TabTrigger name="UserGroups" href="/userGroups" asChild>
+              <TabButton>UserGroups</TabButton>
+            </TabTrigger>
+
             <TabTrigger name="profile" href="/profile" asChild>
               <TabButton>Profile</TabButton>
             </TabTrigger>
+            </>
           )}
 
 
