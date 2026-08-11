@@ -6,7 +6,7 @@ import { BottomTabInset, MaxContentWidth, Spacing, } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
 import { useEffect, useState } from 'react';
-import { Button, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 
 export type UsergroupData = {
@@ -40,6 +40,9 @@ type Props = {
   users: users[];
   storkItmes: storkItmes[];
 
+  onRemoveUser?: (id: string) => void;
+  onRemoveStorkItme?: (uuid: string) => void;
+
 
   onSubmit: (data: UsergroupData) => boolean;
   onDelete?: () => boolean;
@@ -62,6 +65,8 @@ export function UsergroupForm({
   initialValues,
   onSubmit,
   onDelete,
+  onRemoveUser,
+  onRemoveStorkItme,
   buttonText="Save",
   loading=false,
   thisIsToUpdate=false
@@ -98,6 +103,16 @@ function update<K extends keyof UsergroupData>(
  }));
 }
 
+function removeUser(id: string){
+  update("users", form.users.filter(u => u.id !== id) as any);
+  onRemoveUser?.(id);
+}
+
+function removeStorkItme(uuid: string){
+  update("storkItmes", form.storkItmes.filter(s => s.uuid !== uuid) as any);
+  onRemoveStorkItme?.(uuid);
+}
+
 
 async function submit(){
 
@@ -124,10 +139,9 @@ useEffect(() => {
 
 return (
 
-
     <ScrollView>
 
-<ThemedView type="backgroundElement" style={[styles.stepContainer, {marginTop:Spacing.four}]}>
+<ThemedView type="backgroundElement" style={[styles.stepContainer, {marginTop:Spacing.four}]}> 
 
 <TextInputWithLabel
  labelText="Name"
@@ -148,6 +162,78 @@ return (
     update("color",color);
   }}
 />
+
+<ThemedText type="default" style={{color:theme.text, marginTop: Spacing.two}}>
+  Users
+</ThemedText>
+<View>
+  <View style={[styles.row, styles.header]}>
+    {[{ key: 'userName', title: 'User' },{ key: 'email', title: 'Email' }].map((column) => (
+      <Text key={column.key} style={styles.headerCell}>
+        {column.title}
+      </Text>
+    ))}
+    <Text style={[styles.headerCell, {minWidth:100}]}>Action</Text>
+  </View>
+
+  {form.users.length === 0 ? (
+    <ThemedText type="default" style={{color:theme.text, padding: Spacing.two}}>No users</ThemedText>
+  ) : (
+    form.users.map((item) => (
+      <View key={item.id} style={styles.row}>
+        <ThemedText type="default" style={styles.cell}>
+          {item.userName}
+        </ThemedText>
+        <ThemedText type="default" style={styles.cell}>
+          {item.email}
+        </ThemedText>
+        <View style={{minWidth:100}}>
+          <Button title="Remove" color={theme['red']} onPress={() => removeUser(item.id)} />
+        </View>
+      </View>
+    ))
+  )}
+</View>
+
+<ThemedText type="default" style={{color:theme.text, marginTop: Spacing.two}}>
+  StorkItmes
+</ThemedText>
+<View>
+
+
+  <View style={[styles.row, styles.header]}>
+    {[{ key: 'name', title: 'Name' }, { key: 'ean', title: 'EAN' }, { key: 'itemNumber', title: 'Item Number' }, { key: 'storeLocation', title: 'Store Location' }].map((column) => (
+      <Text key={column.key} style={styles.headerCell}>
+        {column.title}
+      </Text>
+    ))}
+    <Text style={[styles.headerCell, {minWidth:100}]}>Action</Text>
+  </View>
+
+  {form.storkItmes.length === 0 ? (
+    <ThemedText type="default" style={{color:theme.text, padding: Spacing.two}}>No stork items</ThemedText>
+  ) : (
+    form.storkItmes.map((item) => (
+      <View key={item.uuid} style={styles.row}>
+        <ThemedText type="default" style={styles.cell}>
+          {item.name}
+        </ThemedText>
+        <ThemedText type="default" style={styles.cell}>
+          {item.ean}
+        </ThemedText>
+        <ThemedText type="default" style={styles.cell}>
+          {item.itemNumber}
+        </ThemedText>
+        <ThemedText type="default" style={styles.cell}>
+          {item.storeLocation}
+        </ThemedText>
+        <View style={{minWidth:100}}>
+          <Button title="Remove" color={theme['red']} onPress={() => removeStorkItme(item.uuid)} />
+        </View>
+      </View>
+    ))
+  )}
+</View>
 
 {(thisIsToUpdate && hasIRightRole('Manager')) && (
         
@@ -249,5 +335,35 @@ const styles = StyleSheet.create({
   buttonUpdate: {
     marginTop: Spacing.four,
     borderRadius: 5,
+  },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    alignItems: 'center',
+  },
+
+  cell: {
+    flex: 1,
+    flexBasis: 100,
+    minWidth: 100,
+    padding: 8,
+    fontSize: 13,
+    flexShrink: 1,
+  },
+
+  header: {
+    backgroundColor: '#f2f2f2',
+  },
+
+  headerCell: {
+    flex: 1,
+    flexBasis: 100,
+    minWidth: 100,
+    padding: 8,
+    fontWeight: '700',
+    fontSize: 13,
+    flexShrink: 1,
   },
 });

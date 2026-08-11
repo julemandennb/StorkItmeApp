@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
-    paddingTop: Spacing.three,
+    paddingTop: Spacing.six,
   },
   title: {
     textAlign: 'center',

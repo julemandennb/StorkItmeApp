@@ -38,7 +38,7 @@ export default function AppTabs() {
           ) : (
             <>
             <TabTrigger name="UserGroups" href="/userGroups" asChild>
-              <TabButton>UserGroups</TabButton>
+              <TabButton>User Groups</TabButton>
             </TabTrigger>
 
             <TabTrigger name="profile" href="/profile" asChild>
