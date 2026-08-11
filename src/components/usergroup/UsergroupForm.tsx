@@ -2,7 +2,7 @@ import { TextInputWithLabel } from '@/components/text-input-with-label';
 import { ThemeColorPicker } from '@/components/themed-color-picker';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing, } from '@/constants/theme';
+import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
 import { useEffect, useState } from 'react';
@@ -140,8 +140,10 @@ useEffect(() => {
 return (
 
     <ScrollView>
-
+<ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
 <ThemedView type="backgroundElement" style={[styles.stepContainer, {marginTop:Spacing.four}]}> 
+
+<View style={{ width:325}}>
 
 <TextInputWithLabel
  labelText="Name"
@@ -162,6 +164,12 @@ return (
     update("color",color);
   }}
 />
+
+</View>
+
+{(thisIsToUpdate && hasIRightRole('Manager')) && (
+        
+<>
 
 <ThemedText type="default" style={{color:theme.text, marginTop: Spacing.two}}>
   Users
@@ -235,18 +243,11 @@ return (
   )}
 </View>
 
-{(thisIsToUpdate && hasIRightRole('Manager')) && (
-        
-<>
-
-
-
-
 </>
 
 )}
 
-
+<View style={{ width:325}}>
 {(hasIRightRole('Manager')) && (
   <View style={styles.buttonUpdate}>
     <Button
@@ -270,10 +271,11 @@ return (
   </View>
   )}
 
-
+</View>
 
 
 </ThemedView>
+</ScrollView>
  </ScrollView>
 
 
@@ -295,7 +297,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.three,
     paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
     paddingTop: Spacing.three,
   },
   heroSection: {
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
-    width:350
+    width:'100%'
   },
   input: {
     height: 40,
@@ -342,6 +343,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     alignItems: 'center',
+    width: 500,
   },
 
   cell: {
