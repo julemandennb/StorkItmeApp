@@ -1,5 +1,6 @@
 import { TextInputWithLabel } from '@/components/text-input-with-label';
 import { ThemeColorPicker } from '@/components/themed-color-picker';
+import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing, } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -11,14 +12,34 @@ import { Button, ScrollView, StyleSheet, View } from 'react-native';
 export type UsergroupData = {
   name: string;
   color: string;
+  users: users[];
+  storkItmes: storkItmes[];
 };
+
+export type users = {
+  id: string;
+  email: string;
+  userName: string;
+}
+
+export type storkItmes = {
+  uuid: string;
+  name: string;
+  description: string;
+  bestBy: string;
+  ean: string;
+  itemNumber: string;
+  storeLocation: string;
+  type: string;
+}
 
 
 
 type Props = {
   initialValues?: UsergroupData;
-  usergroups: any[];
-  usergroupgroups: any[];
+  users: users[];
+  storkItmes: storkItmes[];
+
 
   onSubmit: (data: UsergroupData) => boolean;
   onDelete?: () => boolean;
@@ -32,6 +53,8 @@ type Props = {
 const emptyValues: UsergroupData = {
   name:'',
   color:'#ffffff',
+  users:[],
+  storkItmes:[],
 };
 
 
@@ -45,11 +68,9 @@ export function UsergroupForm({
 
 }: Props) {
 
-  const {hasIRightRole } = useAuth();
-
+const {hasIRightRole } = useAuth();
 
 const theme = useTheme();
-
 
 const [form,setForm] = useState<UsergroupData>(
   initialValues ?? emptyValues
@@ -60,6 +81,8 @@ function nullSet(){
   setForm({
     name:'',
     color:'',
+    users:[],
+    storkItmes:[],
   });
 
 }
@@ -115,13 +138,9 @@ return (
 />
 
 
-<TextInputWithLabel
- labelText="Color"
- labelType="default"
- style={[styles.input,{color:theme.text}]}
- value={form.color}
- onChangeText={(v)=>update("color",v)}
-/>
+<ThemedText type="default" style={{color:theme.text}}>
+  Color
+</ThemedText>
 
 <ThemeColorPicker
   resultColorOn={form.color}
@@ -129,6 +148,17 @@ return (
     update("color",color);
   }}
 />
+
+{(thisIsToUpdate && hasIRightRole('Manager')) && (
+        
+<>
+
+
+
+
+</>
+
+)}
 
 
 {(hasIRightRole('Manager')) && (

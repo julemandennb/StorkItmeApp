@@ -11,7 +11,7 @@ export default function UsergroupLayout() {
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <AnimatedSplashOverlay />
           <Stack>
-            {/* <Stack.Screen name="[id]" options={{ headerTitle:"Update usergroup"}} /> */}
+            <Stack.Screen name="[id]" options={{ headerTitle:"Update usergroup"}} />
         </Stack>
         </ThemeProvider>
       </AuthProvider>

@@ -3,8 +3,8 @@ import { ThemedView } from '@/components/themed-view';
 import { UsergroupForm } from '@/components/usergroup/UsergroupForm';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import { apiPost } from '@/services/api';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { apiGet, apiPut } from '@/services/api';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,19 +15,56 @@ export default function UsergroupCreate() {
 
     const { loggedIn,hasIRightRole } = useAuth();
     const router = useRouter();
-
-
+    const { id } = useLocalSearchParams();
     const [saving, setSaving] = useState(false);
+
+    const [usergroup, setUsergroup] = useState(null);
+
+    const loadusergroup = async () =>
+    {
+      if(loggedIn)
+        {
+            let url = '/usergroup/Get?uuid='+id
+            const usergroupApi = await apiGet(url);
+
+            const formData = {
+                name: usergroupApi.name ?? '',
+                color: usergroupApi.color ?? '',
+                users: usergroupApi.users ?? [],
+                storkItmes: usergroupApi.storkItmes ?? [],
+            };
+
+            console.log("formData",formData)
+
+            setUsergroup(formData)
+
+        }
+        else
+        {
+            setUsergroup(null)
+        }
+    }
+
+    const [storkitme , setStorkitme] = useState([]);
+
 
 
 
     useFocusEffect(
       useCallback(() => {
 
-      }, [loggedIn])
+        if (!loggedIn) {
+            setUsergroup(null)
+            return;
+        }
+
+        loadusergroup();
+        
+
+      }, [loggedIn, id])
     );
 
-    async function makeNewUsergroup(data:any) {
+    async function makeUpdateUsergroup(data:any) {
       setSaving(true);
 
       try {
@@ -37,7 +74,7 @@ export default function UsergroupCreate() {
           return false;
         }
 
-        const res = await apiPost('/usergroup/Create',data)
+        const res = await apiPut('/usergroup/Update',data)
 
         console.log("res",res)
 
@@ -59,12 +96,14 @@ export default function UsergroupCreate() {
 <ThemedView style={styles.container}>
 <SafeAreaView style={styles.safeArea}>
  <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
-            Create a new usergroup
+            Update usergroup
           </ThemedText>
 
         <UsergroupForm
-            onSubmit={makeNewUsergroup}
-            buttonText="Make new usergroup"
+            initialValues={usergroup}
+            onSubmit={makeUpdateUsergroup}
+            buttonText="Update usergroup"
+            thisIsToUpdate={true}
         />
 
 

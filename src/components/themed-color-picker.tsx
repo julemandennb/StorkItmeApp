@@ -1,5 +1,5 @@
 import { useTheme } from '@/hooks/use-theme';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 
@@ -16,6 +16,12 @@ export function ThemeColorPicker({resultColorOn, onColorPick }: {resultColorOn: 
   const [resultColor, setResultColor] = useState(resultColorOn);
 
   const currentColor = useSharedValue(resultColorOn);
+
+  useEffect(() => {
+    if(resultColorOn){
+      setResultColor(resultColorOn);
+    }
+  }, [resultColorOn]);
 
   // runs on the ui thread on color change
   const onColorChange = (color: ColorFormatsObject) => {
