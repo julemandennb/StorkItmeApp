@@ -91,7 +91,7 @@ export async function apiPut(path, data) {
   }
 }
 
-export async function apiDelete(path)
+export async function apiDelete(path, data = null)
 {
   try {
     const apiUrl = await storeGetInfo('apiUrl');
@@ -106,7 +106,8 @@ export async function apiDelete(path)
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
-      }
+      },
+      body: data ? JSON.stringify(data) : null,
     }); 
 
     if (!response.ok) {

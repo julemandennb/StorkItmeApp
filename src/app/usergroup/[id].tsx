@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { UsergroupForm } from '@/components/usergroup/UsergroupForm';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import { apiGet, apiPut } from '@/services/api';
+import { apiDelete, apiGet, apiPut } from '@/services/api';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
@@ -19,6 +19,8 @@ export default function UsergroupCreate() {
     const [saving, setSaving] = useState(false);
 
     const [usergroup, setUsergroup] = useState(null);
+    const [storkitmes , setStorkitmes] = useState([]);
+    const [users , setUsers] = useState([]);
 
     const loadusergroup = async () =>
     {
@@ -34,9 +36,10 @@ export default function UsergroupCreate() {
                 storkItmes: usergroupApi.storkItmes ?? [],
             };
 
-            console.log("formData",formData)
-
             setUsergroup(formData)
+
+            loadStorkItmes();
+            loadUser();
 
         }
         else
@@ -45,7 +48,27 @@ export default function UsergroupCreate() {
         }
     }
 
-    const [storkitme , setStorkitme] = useState([]);
+    const loadStorkItmes = async () =>
+    {
+      if(loggedIn)
+        {
+            let url = '/storkitme/GetAll'
+            const storkItmesApi = await apiGet(url);
+            setStorkitmes(storkItmesApi);
+        }
+    }
+
+    const loadUser = async () =>
+    {
+      if(loggedIn && hasIRightRole('Manager'))
+      {
+        let url = '/GetAllUser'
+        const usersApi = await apiGet(url);
+        setUsers(usersApi);
+
+      }
+    }
+  
 
 
 
@@ -55,10 +78,13 @@ export default function UsergroupCreate() {
 
         if (!loggedIn) {
             setUsergroup(null)
+            setStorkitmes([])
+            setUsers([])
             return;
         }
 
         loadusergroup();
+       
         
 
       }, [loggedIn, id])
@@ -74,9 +100,7 @@ export default function UsergroupCreate() {
           return false;
         }
 
-        const res = await apiPut('/usergroup/Update',data)
-
-        console.log("res",res)
+        const res = await apiPut('/usergroup/Updata?id=' + id, data)
 
         return true;
       } 
@@ -89,6 +113,109 @@ export default function UsergroupCreate() {
       }
     }
 
+    async function RemoveUser(idUser:any) {
+      setSaving(true);  
+
+      const body = {
+        userGroupId: id,
+        UserId : idUser
+      };
+
+      apiDelete('/usergroup/RemoveUser', body)
+
+    }
+
+    async function RemoveStorkItme(uuid:any) {
+      setSaving(true);
+
+      try
+      {
+        if(!loggedIn)
+        {
+          return false;
+        }
+      const body = {
+       userGroupId: ""
+      };
+
+      const res = await apiPut('/storkitme/' + uuid, body)
+    }catch
+    {
+
+    }
+    finally {
+      setSaving(false);
+    }
+    }
+
+    async function AddUser(idUser:any) {
+      setSaving(true);
+
+      try
+      {
+        if(!loggedIn)
+        {
+          return false;
+        }
+
+      const body = {
+        userGroupId: id,
+        UserId : idUser
+      };
+
+      const res = await apiPut('/usergroup/AddUser', body)
+      }
+      catch
+      {
+      }
+      finally {
+        setSaving(false);
+      }
+    }
+
+    async function AddStorkItme(uuid:any)  {
+      setSaving(true);
+
+      try
+      {
+        if(!loggedIn)
+        {
+          return false;
+        }
+      const body = {
+       userGroupId: id
+      };
+
+      const res = await apiPut('/storkitme/' + uuid, body)
+    }catch
+    {
+
+    }
+    finally {
+      setSaving(false);
+    }
+    }
+
+    async function deleteUsergroup() {
+      setSaving(true);
+
+      try
+      {
+        if(!loggedIn)
+        {
+          return false;
+        }
+
+        const res = await apiDelete('/usergroup/Delete?uuid=' + id)
+
+        router.push(`/`);
+
+      }
+      catch{}
+      finally {
+        setSaving(false);
+      }
+    }
 
 
  return (
@@ -104,6 +231,13 @@ export default function UsergroupCreate() {
             onSubmit={makeUpdateUsergroup}
             buttonText="Update usergroup"
             thisIsToUpdate={true}
+            onRemoveUser={RemoveUser}
+            onRemoveStorkItme={RemoveStorkItme}
+            storkItmesList={storkitmes}
+            usersList={users}
+            onAddUser={AddUser}
+            onAddStorkItme={AddStorkItme}
+            onDelete={deleteUsergroup}
         />
 
 

@@ -1,3 +1,4 @@
+import { PickerInputLabel } from '@/components/picker-input-label';
 import { TextInputWithLabel } from '@/components/text-input-with-label';
 import { ThemeColorPicker } from '@/components/themed-color-picker';
 import { ThemedText } from '@/components/themed-text';
@@ -37,10 +38,12 @@ export type storkItmes = {
 
 type Props = {
   initialValues?: UsergroupData;
-  users: users[];
-  storkItmes: storkItmes[];
+  usersList: users[];
+  storkItmesList: storkItmes[];
 
   onRemoveUser?: (id: string) => void;
+  onAddUser?: (id: string) => void;
+  onAddStorkItme?: (uuid: string) => void;
   onRemoveStorkItme?: (uuid: string) => void;
 
 
@@ -67,9 +70,13 @@ export function UsergroupForm({
   onDelete,
   onRemoveUser,
   onRemoveStorkItme,
+  onAddUser,
+  onAddStorkItme,
   buttonText="Save",
   loading=false,
-  thisIsToUpdate=false
+  thisIsToUpdate=false,
+  usersList=[],
+  storkItmesList=[]
 
 }: Props) {
 
@@ -103,6 +110,39 @@ function update<K extends keyof UsergroupData>(
  }));
 }
 
+function addUser(id: string){
+  if (!id) {
+    return;
+  }
+
+  if (form.users.some((user) => user.id === id)) {
+    return;
+  }
+
+  const selectedUser = usersList.find((user) => user.id === id);
+  if (!selectedUser) {
+    return;
+  }
+
+  update("users", [...form.users, selectedUser] as any);
+  onAddUser?.(id);
+}
+
+function addStorkItme(uuid: string){
+  if (!uuid) {
+    return;
+  }
+  if (form.storkItmes.some((storkItme) => storkItme.uuid === uuid)) {
+    return;
+  }
+  const selectedStorkItme = storkItmesList.find((storkItme) => storkItme.uuid === uuid);
+  if (!selectedStorkItme) {
+    return;
+  }
+  update("storkItmes", [...form.storkItmes, selectedStorkItme] as any);
+  onAddStorkItme?.(uuid);
+}
+
 function removeUser(id: string){
   update("users", form.users.filter(u => u.id !== id) as any);
   onRemoveUser?.(id);
@@ -123,13 +163,16 @@ async function submit(){
 
  const res = await onSubmit(form);
 
-  if(res)
+  if(res && !thisIsToUpdate)
     nullSet();
 }
 
 async function deleteFun() {
   await onDelete?.();
 }
+
+//make a function will add user to the form.users array and call onaddUser with the user id
+
 
 useEffect(() => {
   if(initialValues){
@@ -174,6 +217,22 @@ return (
 <ThemedText type="default" style={{color:theme.text, marginTop: Spacing.two}}>
   Users
 </ThemedText>
+
+<View style={{ width:325}}>
+<PickerInputLabel
+ labelText="User"
+ labelType="default"
+ showDefault
+ defaultValue=""
+ datakey="id"
+ datalabel="userName"
+ datavalue="id"
+ data={usersList}
+ onValueChange={(v)=>addUser(v)}
+ style={styles.inputPicker}
+/>
+</View>
+
 <View>
   <View style={[styles.row, styles.header]}>
     {[{ key: 'userName', title: 'User' },{ key: 'email', title: 'Email' }].map((column) => (
@@ -206,6 +265,23 @@ return (
 <ThemedText type="default" style={{color:theme.text, marginTop: Spacing.two}}>
   StorkItmes
 </ThemedText>
+
+<View style={{ width:325}}>
+<PickerInputLabel
+ labelText="StorkItme"
+ labelType="default"
+ showDefault
+ defaultValue=""
+ datakey="uuid"
+ datalabel="name"
+ datavalue="uuid"
+ data={storkItmesList}
+ onValueChange={(v)=>addStorkItme(v)}
+ style={styles.inputPicker}
+/>
+</View>
+
+ 
 <View>
 
 
