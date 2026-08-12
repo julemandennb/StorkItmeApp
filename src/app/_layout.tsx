@@ -17,6 +17,8 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="storkitme" options={{ headerShown: false }} />
+          <Stack.Screen name="usergroup" options={{ headerShown: false }} />
+          <Stack.Screen name="storkitmegroup" options={{ headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </AuthProvider>

@@ -1,9 +1,9 @@
-import { StorkitmeForm } from "@/components/storkitme/StorkitmeForm";
+import { StorkitmegroupForm } from '@/components/storkitmegroup/StorkitmegroupForm';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import { apiGet, apiPost } from '@/services/api';
+import { apiPost } from '@/services/api';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
@@ -11,58 +11,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
-export default function StorkitmeCreate() {
+export default function StorkitmegroupCreate() {
 
     const { loggedIn,hasIRightRole } = useAuth();
     const router = useRouter();
 
 
-    const [storkitmegroups , setStorkitmegroup] = useState([]);
-    const [usergroups , setUsergroup] = useState([]);
-
     const [saving, setSaving] = useState(false);
 
-    const loadusergroup = async () =>
-    {
-      if(loggedIn)
-      {
-        let url = '/usergroup/GetAll?showAllGroup=false&includeStorkItmes=false&includeUsers=false'
-        const usergroupApi = await apiGet(url);
-        setUsergroup(usergroupApi);
-      }
-      else
-        setUsergroup([]);
-    }
 
-    const loadStorkitmegroup = async () =>
-    {
-      if(loggedIn)
-      {
-        let url = '/storkitmegroup/GetAll?showAllGroup=false&includeStorkItmes=false&includeUsers=false'
-        const storkitmegroupApi = await apiGet(url);
-        setStorkitmegroup(storkitmegroupApi);
-      }
-      else
-        setStorkitmegroup([]);
-
-    }
 
     useFocusEffect(
       useCallback(() => {
 
-        if (!loggedIn) {
-
-          setStorkitmegroup([]);
-          setUsergroup([]);
-          return;
-        }
-        loadusergroup();
-        loadStorkitmegroup();
-
       }, [loggedIn])
     );
 
-    async function makeNewStorkitme(data:any) {
+    async function makeNewStorkitmegroup(data:any) {
       setSaving(true);
 
       try {
@@ -72,9 +37,9 @@ export default function StorkitmeCreate() {
           return false;
         }
 
-       
+        const res = await apiPost('/storkitmegroup/Create',data)
 
-        const res = await apiPost('/storkitme/Create',data)
+        router.push('/storkitmegroup/'+res.uuid)
 
         return true;
       } 
@@ -94,22 +59,16 @@ export default function StorkitmeCreate() {
 <ThemedView style={styles.container}>
 <SafeAreaView style={styles.safeArea}>
  <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
-            Create a new storkitme
+            Create a new storkitmegroup
           </ThemedText>
 
+        <StorkitmegroupForm
+            onSubmit={makeNewStorkitmegroup}
+            buttonText="Make new storkitmegroup"
+        />
 
 
-      <StorkitmeForm
-    
-        usergroups={usergroups}
 
-        storkitmegroups={storkitmegroups}
-
-        onSubmit={makeNewStorkitme}
-
-        buttonText="Make new StorkItme"
-
-      />
 </SafeAreaView>
 </ThemedView>
   )
@@ -127,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.three,
     maxWidth: MaxContentWidth,
-    paddingTop: Spacing.three,
+    paddingTop: Spacing.six,
   },
   title: {
     textAlign: 'center',

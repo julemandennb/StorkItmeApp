@@ -31,6 +31,30 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
+
+      {loggedIn ? (
+       
+        <NativeTabs.Trigger name="userGroups">
+          <NativeTabs.Trigger.Label>User Groups</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={require('@/assets/images/tabIcons/explore.png')}
+            renderingMode="template"
+          />
+        </NativeTabs.Trigger>
+      ) : null}
+
+         {loggedIn ? (
+       
+        <NativeTabs.Trigger name="storkItmeGroups">
+          <NativeTabs.Trigger.Label>storkItme Groups</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={require('@/assets/images/tabIcons/explore.png')}
+            renderingMode="template"
+          />
+        </NativeTabs.Trigger>
+      ) : null}
+
+
       {!loggedIn ? (
         <NativeTabs.Trigger name="login">
           <NativeTabs.Trigger.Label>Login</NativeTabs.Trigger.Label>
@@ -40,6 +64,7 @@ export default function AppTabs() {
           />
         </NativeTabs.Trigger>
       ) : (
+        
         <NativeTabs.Trigger name="profile">
           <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
@@ -47,7 +72,8 @@ export default function AppTabs() {
             renderingMode="template"
           />
         </NativeTabs.Trigger>
-      )}
+  
+)}
 
     </NativeTabs>
   );

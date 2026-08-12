@@ -17,56 +17,47 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
     const { name,loggedIn,hasIRightRole } = useAuth();
-        const theme = useTheme();
-  const router = useRouter();
+    const theme = useTheme();
+    const router = useRouter();
+
+    if(!loggedIn || !hasIRightRole("Manager"))
+    {
+        router.push("/")
+    }
     
 
-  const [storkItems,setStorkItems] = useState([]);
-  const [showUsergroup , setshowUsergroup] = useState(false);
-  const [showStorkItmeGroup , setshowStorkItmeGroup] = useState(false);
+  const [storkitmegroups,setstorkitmegroups] = useState([]);
+  const [showAllStorkitmegroups, setshowAllStorkitmegroups] = useState(false);
 
   const columns = [
     { key: "name", title: "Name" },
-    { key: "type", title: "Type" },
-    { key: "bestBy", title: "Best By" },
     { key: "description", title: "Description" },
-    { key: "stork", title: "Stock" },
-    { key: "storeLocation", title: "Location" },
-    { key: "itemNumber", title: "Item No" },
-    { key: "ean", title: "EAN" },
   ];
 
-    const loadStorkitmesApi = async ( 
-      usergroup = showUsergroup,
-      storkItmeGroup = showStorkItmeGroup
+    const loadStorkitmegroupsApi = async ( 
+      storkitmegroup = showAllStorkitmegroups,
     ) => {
 
-      let url = '/storkitme/GetAll?GetFromUsergroup='+usergroup+'&GetFromStorkItmeGroup='+storkItmeGroup;
+      let url = '/storkitmegroup/GetAll?showAllGroup='+storkitmegroup;
 
-      const storkitmesApi = await apiGet(url);
-      setStorkItems(storkitmesApi);
+      const storkitmegroupsApi = await apiGet(url);
+      setstorkitmegroups(storkitmegroupsApi);
     };
 
     useEffect(() => {
       let mounted = true;
-      loadStorkitmesApi();
+      loadStorkitmegroupsApi();
       return () => {
         mounted = false;
       };
-    }, [showUsergroup, showStorkItmeGroup,loggedIn]);
+    }, [showAllStorkitmegroups, loggedIn]);
 
   const renderRow = ({ item }) => (
-    <Pressable onPress={() => router.push(`/storkitme/${item.uuid}`)}>
-      <View style={[styles.row, {backgroundColor: item.stork <= 0 ? theme['red'] : ""  }]}>
+    <Pressable onPress={() => router.push(`/storkitmegroup/${item.uuid}`)}>
+      <View style={[styles.row]}>
         {columns.map((column) => {
           let val = item[column.key];
 
-          if (column.key === "bestBy" && val) {
-            const date = new Date(val);
-            val = `${String(date.getDate()).padStart(2, "0")}/${String(
-              date.getMonth() + 1
-            ).padStart(2, "0")}/${date.getFullYear()}`;
-          }
           return (
             
               <ThemedText
@@ -86,15 +77,15 @@ export default function HomeScreen() {
   
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea]}>
         <ThemedView style={styles.heroSection}>
           <ThemedText type="title" style={styles.title}>
-            {name ? `Welcome ${name}` : 'Welcome to StorkItmeApp'}
+            {'UserGroups'}
           </ThemedText>
         </ThemedView>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-        <View style={{ flex: 1, width: "100%" }}>
+        <ThemedView type="backgroundElement" style={[styles.stepContainer]}>
+        <View style={[styles.center,{width: "100%", }]}>
   <ScrollView
     horizontal
     showsHorizontalScrollIndicator
@@ -103,39 +94,36 @@ export default function HomeScreen() {
 
       <View style={styles.buttonContainer} >
         <View style={[{display: !(loggedIn && hasIRightRole("Member")) ? "none" : "flex", marginBottom: Spacing.three}]}>
-          <Link href="/storkitme/create" asChild>
+          <Link href="/storkitmegroup/create" asChild>
             <Button
-              title="Make a new storkItem"
+              title="Make a new storkitmegroup"
               onPress={() => { console.log('create pressed (link)'); }}
             />
           </Link>
         </View>
 
         <View style={[{display: !(loggedIn) ? "none" : "flex",marginBottom: Spacing.three}]}>
-               <ThemedCheckbox label="Show only from Usergroup" value={showUsergroup}  onValueChange={setshowUsergroup} />
+               <ThemedCheckbox label="Show all Storkitmegroups" value={showAllStorkitmegroups}  onValueChange={setshowAllStorkitmegroups} />
         </View>
 
-        <View style={[{display: !(loggedIn) ? "none" : "flex" }]}>
-          <ThemedCheckbox label="Show only from StorkItmeGroup"  value={showStorkItmeGroup} onValueChange={setshowStorkItmeGroup} />
 
+      </View>
+
+        <View style={[styles.row, styles.header]}>
+            {columns.map((column) => (
+            <Text key={column.key} style={styles.headerCell}>
+                {column.title}
+            </Text>
+            ))}
         </View>
-      
-      </View>
 
-      <View style={[styles.row, styles.header]}>
-        {columns.map((column) => (
-          <Text key={column.key} style={styles.headerCell}>
-            {column.title}
-          </Text>
-        ))}
-      </View>
+        <FlatList
+            data={storkitmegroups}
+            keyExtractor={(item) => item.uuid}
+            renderItem={renderRow}
+            style={{ flex: 1 }}
+        />
 
-      <FlatList
-        data={storkItems}
-        keyExtractor={(item) => item.uuid}
-        renderItem={renderRow}
-        style={{ flex: 1 }}
-      />
 
     </View>
   </ScrollView>
@@ -183,7 +171,7 @@ const styles = StyleSheet.create({
   },
 
    table: {
-    minWidth: 900,
+    minWidth: 500,
     margin: 10,
   },
 
@@ -194,7 +182,7 @@ const styles = StyleSheet.create({
   },
 
   cell: {
-    width: 120,
+    flex: 1,
     padding: 10,
     fontSize: 14,
   },
@@ -204,13 +192,18 @@ const styles = StyleSheet.create({
   },
 
   headerCell: {
-    width: 120,
+    flex: 1,
     padding: 10,
-    fontWeight: "700",
+    fontWeight: "bold",
     fontSize: 14,
   },
   buttonContainer: {
     alignItems: 'flex-start',
     marginBottom: Spacing.four
+  },
+    center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
