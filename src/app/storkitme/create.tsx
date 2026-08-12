@@ -1,7 +1,7 @@
 import { StorkitmeForm } from "@/components/storkitme/StorkitmeForm";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { apiGet, apiPost } from '@/services/api';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     alignItems: 'center',
     gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
     paddingTop: Spacing.three,
   },

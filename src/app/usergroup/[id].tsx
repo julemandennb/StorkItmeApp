@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { UsergroupForm } from '@/components/usergroup/UsergroupForm';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { apiDelete, apiGet, apiPut } from '@/services/api';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -62,7 +62,7 @@ export default function UsergroupCreate() {
     {
       if(loggedIn && hasIRightRole('Manager'))
       {
-        let url = '/GetAllUser'
+        let url = '/user/GetAll'
         const usersApi = await apiGet(url);
         setUsers(usersApi);
 
@@ -208,7 +208,7 @@ export default function UsergroupCreate() {
 
         const res = await apiDelete('/usergroup/Delete?uuid=' + id)
 
-        router.push(`/`);
+        router.push(`/userGroups`);
 
       }
       catch{}
@@ -258,7 +258,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     alignItems: 'center',
     gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
     paddingTop: Spacing.three,
   },
