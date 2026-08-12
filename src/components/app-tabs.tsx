@@ -43,6 +43,17 @@ export default function AppTabs() {
         </NativeTabs.Trigger>
       ) : null}
 
+         {loggedIn ? (
+       
+        <NativeTabs.Trigger name="storkItmeGroups">
+          <NativeTabs.Trigger.Label>storkItme Groups</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={require('@/assets/images/tabIcons/explore.png')}
+            renderingMode="template"
+          />
+        </NativeTabs.Trigger>
+      ) : null}
+
 
       {!loggedIn ? (
         <NativeTabs.Trigger name="login">
