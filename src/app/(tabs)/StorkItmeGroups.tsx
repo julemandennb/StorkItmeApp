@@ -22,38 +22,39 @@ export default function HomeScreen() {
 
     if(!loggedIn || !hasIRightRole("Manager"))
     {
-      router.push("/")
+        router.push("/")
     }
     
 
-  const [usergroups,setusergroups] = useState([]);
-  const [showAllUsergroups, setshowAllUsergroups] = useState(false);
+  const [storkitmegroups,setstorkitmegroups] = useState([]);
+  const [showAllStorkitmegroups, setshowAllStorkitmegroups] = useState(false);
 
   const columns = [
     { key: "name", title: "Name" },
+    { key: "description", title: "Description" },
   ];
 
-    const loadUsergroupsApi = async ( 
-      usergroup = showAllUsergroups,
+    const loadStorkitmegroupsApi = async ( 
+      storkitmegroup = showAllStorkitmegroups,
     ) => {
 
-      let url = '/usergroup/GetAll?showAllGroup='+usergroup;
+      let url = '/storkitmegroup/GetAll?showAllGroup='+storkitmegroup;
 
-      const usergroupsApi = await apiGet(url);
-      setusergroups(usergroupsApi);
+      const storkitmegroupsApi = await apiGet(url);
+      setstorkitmegroups(storkitmegroupsApi);
     };
 
     useEffect(() => {
       let mounted = true;
-      loadUsergroupsApi();
+      loadStorkitmegroupsApi();
       return () => {
         mounted = false;
       };
-    }, [showAllUsergroups, loggedIn]);
+    }, [showAllStorkitmegroups, loggedIn]);
 
   const renderRow = ({ item }) => (
-    <Pressable onPress={() => router.push(`/usergroup/${item.uuid}`)}>
-      <View style={[styles.row, {backgroundColor: item.stork <= 0 ? theme['red'] : ""  }]}>
+    <Pressable onPress={() => router.push(`/storkitmegroup/${item.uuid}`)}>
+      <View style={[styles.row]}>
         {columns.map((column) => {
           let val = item[column.key];
 
@@ -93,16 +94,16 @@ export default function HomeScreen() {
 
       <View style={styles.buttonContainer} >
         <View style={[{display: !(loggedIn && hasIRightRole("Member")) ? "none" : "flex", marginBottom: Spacing.three}]}>
-          <Link href="/usergroup/create" asChild>
+          <Link href="/storkitmegroup/create" asChild>
             <Button
-              title="Make a new usergroup"
+              title="Make a new storkitmegroup"
               onPress={() => { console.log('create pressed (link)'); }}
             />
           </Link>
         </View>
 
         <View style={[{display: !(loggedIn) ? "none" : "flex",marginBottom: Spacing.three}]}>
-               <ThemedCheckbox label="Show all Usergroups" value={showAllUsergroups}  onValueChange={setshowAllUsergroups} />
+               <ThemedCheckbox label="Show all Storkitmegroups" value={showAllStorkitmegroups}  onValueChange={setshowAllStorkitmegroups} />
         </View>
 
 
@@ -117,7 +118,7 @@ export default function HomeScreen() {
         </View>
 
         <FlatList
-            data={usergroups}
+            data={storkitmegroups}
             keyExtractor={(item) => item.uuid}
             renderItem={renderRow}
             style={{ flex: 1 }}
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
   },
 
   cell: {
-    width: 120,
+    flex: 1,
     padding: 10,
     fontSize: 14,
   },
@@ -191,9 +192,9 @@ const styles = StyleSheet.create({
   },
 
   headerCell: {
-    width: 120,
+    flex: 1,
     padding: 10,
-    fontWeight: "700",
+    fontWeight: "bold",
     fontSize: 14,
   },
   buttonContainer: {

@@ -41,6 +41,10 @@ export default function AppTabs() {
               <TabButton>User Groups</TabButton>
             </TabTrigger>
 
+            <TabTrigger name="StorkItmeGroup" href="/StorkItmeGroups" asChild>
+              <TabButton>StorkItme Groups</TabButton>
+            </TabTrigger>
+
             <TabTrigger name="profile" href="/profile" asChild>
               <TabButton>Profile</TabButton>
             </TabTrigger>

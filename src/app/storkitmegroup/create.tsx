@@ -1,6 +1,6 @@
+import { StorkitmegroupForm } from '@/components/storkitmegroup/StorkitmegroupForm';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { UsergroupForm } from '@/components/usergroup/UsergroupForm';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { apiPost } from '@/services/api';
@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
-export default function UsergroupCreate() {
+export default function StorkitmegroupCreate() {
 
     const { loggedIn,hasIRightRole } = useAuth();
     const router = useRouter();
@@ -27,7 +27,7 @@ export default function UsergroupCreate() {
       }, [loggedIn])
     );
 
-    async function makeNewUsergroup(data:any) {
+    async function makeNewStorkitmegroup(data:any) {
       setSaving(true);
 
       try {
@@ -37,9 +37,9 @@ export default function UsergroupCreate() {
           return false;
         }
 
-        const res = await apiPost('/usergroup/Create',data)
+        const res = await apiPost('/storkitmegroup/Create',data)
 
-        router.push('/usergroup/'+res.uuid)
+        router.push('/storkitmegroup/'+res.uuid)
 
         return true;
       } 
@@ -59,12 +59,12 @@ export default function UsergroupCreate() {
 <ThemedView style={styles.container}>
 <SafeAreaView style={styles.safeArea}>
  <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
-            Create a new usergroup
+            Create a new storkitmegroup
           </ThemedText>
 
-        <UsergroupForm
-            onSubmit={makeNewUsergroup}
-            buttonText="Make new usergroup"
+        <StorkitmegroupForm
+            onSubmit={makeNewStorkitmegroup}
+            buttonText="Make new storkitmegroup"
         />
 
 
