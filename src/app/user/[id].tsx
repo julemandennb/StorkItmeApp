@@ -1,4 +1,3 @@
-import { StorkitmeForm } from "@/components/storkitme/StorkitmeForm";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
@@ -143,20 +142,12 @@ export default function StorkitmeCreate() {
 <ThemedView style={styles.container}>
 <SafeAreaView style={styles.safeArea}>
     <ThemedText type="title" style={[styles.title, {marginBottom:Spacing.two}]}>
-        update a storkitme
+        update a user
         </ThemedText>
 
 
 
-    <StorkitmeForm
-        thisIsToUpdate
-        initialValues={storkitme}
-        usergroups={usergroups}
-        storkitmegroups={storkitmegroups}
-        onSubmit={updateStorkitme}
-        onDelete={onDelete}
-        buttonText="Update StorkItme"
-    />
+
 </SafeAreaView>
 </ThemedView>
   )
