@@ -48,9 +48,9 @@ export function PickerInputLabel<T>({
 
         {data.map(item => (
           <Picker.Item
-            key={String(item[datakey])}
-            label={item[datalabel]}
-            value={item[datavalue]}
+            key={String((datakey != "") ? item[datakey] : item)}
+            label={(datalabel != "") ?item[datalabel] : String(item)}
+            value={(datavalue != "") ?item[datavalue] : String(item)}
           />
         ))}
       </Picker>

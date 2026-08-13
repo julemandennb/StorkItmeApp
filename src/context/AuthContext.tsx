@@ -89,6 +89,14 @@ export function AuthProvider({ children }: any) {
     return userRoleIndex >= requiredRoleIndex;
   }
 
+  function getRoleList():string[]
+  {
+    if (role.name !== "Admin") {
+      return roleHierarchy.filter((r) => r !== "Manager" && r !== "Admin");
+    }
+
+    return roleHierarchy;
+  }
   
 
   useEffect(() => {
@@ -109,6 +117,7 @@ export function AuthProvider({ children }: any) {
         logout,
         logoutAlert,
         hasIRightRole,
+        getRoleList,
       }}
     >
       {children}

@@ -17,7 +17,7 @@ import { useAuth } from "@/context/AuthContext";
 
 
 export default function AppTabs() {
-  const { loggedIn } = useAuth();
+  const { loggedIn,hasIRightRole } = useAuth();
 
 
   return (
@@ -37,13 +37,23 @@ export default function AppTabs() {
             </TabTrigger>
           ) : (
             <>
+
+             {hasIRightRole("Manager") ? (
             <TabTrigger name="UserGroups" href="/userGroups" asChild>
               <TabButton>User Groups</TabButton>
             </TabTrigger>
-
-            <TabTrigger name="StorkItmeGroup" href="/StorkItmeGroups" asChild>
+             ) : null}
+              {hasIRightRole("Manager") ? (
+            <TabTrigger name="StorkItmeGroup" href="/storkItmeGroups" asChild>
               <TabButton>StorkItme Groups</TabButton>
             </TabTrigger>
+            ): null}
+
+             {hasIRightRole("Manager") ? (
+            <TabTrigger name="Users" href="/users" asChild>
+              <TabButton>Users</TabButton>
+            </TabTrigger>
+            ): null}
 
             <TabTrigger name="profile" href="/profile" asChild>
               <TabButton>Profile</TabButton>
