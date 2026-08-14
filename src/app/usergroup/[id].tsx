@@ -114,14 +114,24 @@ export default function UsergroupCreate() {
     }
 
     async function RemoveUser(idUser:any) {
-      setSaving(true);  
+      try
+      {
+        setSaving(true);  
 
-      const body = {
-        userGroupId: id,
-        UserId : idUser
-      };
+        const body = {
+          userGroupId: id,
+          UserId : idUser
+        };
 
-      apiDelete('/usergroup/RemoveUser', body)
+        apiDelete('/usergroup/RemoveUser', body)
+
+      }
+      catch
+      {}
+      finally
+      {
+        setSaving(false);  
+      }
 
     }
 

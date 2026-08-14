@@ -176,12 +176,14 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderBottomWidth: 1,
     borderColor: "#ddd",
   },
 
   cell: {
-    width: 120,
+    width: 150,
     padding: 10,
     fontSize: 14,
   },
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
   },
 
   headerCell: {
-    width: 120,
+    width: 150,
     padding: 10,
     fontWeight: "700",
     fontSize: 14,

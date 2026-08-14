@@ -114,14 +114,22 @@ export default function StorkitmegroupCreate() {
     }
 
     async function RemoveUser(idUser:any) {
-      setSaving(true);  
+      try
+      {
+        setSaving(true);  
 
-      const body = {
-        StorkItmeGroupId: id,
-        UserId : [idUser]
-      };
+        const body = {
+          StorkItmeGroupId: id,
+          UserId : [idUser]
+        };
 
-      apiDelete('/storkitmegroup/RemoveUser', body)
+        await apiDelete('/storkitmegroup/RemoveUser', body)
+      }
+      catch
+      {}
+      finally {
+        setSaving(false);
+      }
 
     }
 

@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { UserForm } from '@/components/user/UserForm';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
@@ -22,7 +23,7 @@ export default function StorkitmeCreate() {
 
     const { id } = useLocalSearchParams();
 
-    const [storkitme , setStorkitme] = useState(null);
+    const [user , setUser] = useState(null);
 
     const [storkitmegroups , setStorkitmegroup] = useState([]);
     const [usergroups , setUsergroup] = useState([]);
@@ -33,7 +34,7 @@ export default function StorkitmeCreate() {
     {
       if(loggedIn)
       {
-        let url = '/usergroup/GetAll?showAllGroup=false&includeStorkItmes=false&includeUsers=false'
+        let url = '/usergroup/GetAll?showAllGroup=true&includeStorkItmes=false&includeUsers=false'
         const usergroupApi = await apiGet(url);
         setUsergroup(usergroupApi);
       }
@@ -45,7 +46,7 @@ export default function StorkitmeCreate() {
     {
       if(loggedIn)
       {
-        let url = '/storkitmegroup/GetAll?showAllGroup=false&includeStorkItmes=false&includeUsers=false'
+        let url = '/storkitmegroup/GetAll?showAllGroup=true&includeStorkItmes=false&includeUsers=false'
         const storkitmegroupApi = await apiGet(url);
         setStorkitmegroup(storkitmegroupApi);
       }
@@ -54,31 +55,25 @@ export default function StorkitmeCreate() {
 
     }
 
-    const loadstorkitme = async () =>
+    const loadUser = async () =>
     {
         if(loggedIn)
         {
-            let url = '/storkitme/Get?uuid='+id
-            const storkitmeApi = await apiGet(url);
+            let url = '/user/Get?uuid='+id
+            const userApi = await apiGet(url);
 
             const formData = {
-                name: storkitmeApi.name ?? '',
-                description: storkitmeApi.description ?? '',
-                type: storkitmeApi.type ?? '',
-                bestBy: storkitmeApi.bestBy ?? '',
-                stork: storkitmeApi.stork ?? 0,
-                storeLocation: storkitmeApi.storeLocation ?? '',
-                itemNumber: storkitmeApi.itemNumber ?? '',
-                ean: storkitmeApi.ean ?? '',
+              Email:userApi.email,
+              UserName:userApi.userName,
+              Role:userApi.role?.displayName,
+              UserGroups:userApi.userGroups,
+              StorkItmeGroups:userApi.storkItmeGroups,
+            }
 
-                userGroupId: storkitmeApi.userGroup?.uuid ?? '',
-                storkItmeGroupId: storkitmeApi.storkItmeGroup?.uuid ?? '',
-            };
-
-            setStorkitme(formData);
+            setUser(formData);
         }
         else
-           setStorkitme(null);
+           setUser(null);
     }
 
     useFocusEffect(
@@ -87,18 +82,18 @@ export default function StorkitmeCreate() {
         if (!loggedIn) {
           setStorkitmegroup([]);
           setUsergroup([]);
-          setStorkitme(null);
+          setUser(null);
           return;
         }
         
         loadusergroup();
         loadStorkitmegroup();
-        loadstorkitme();
+        loadUser();
 
       }, [loggedIn, id])
     );
 
-    async function updateStorkitme(data:any) {
+    async function updateUser(data:any) {
       setSaving(true);
 
       try {
@@ -108,7 +103,7 @@ export default function StorkitmeCreate() {
           return false;
         }
 
-        let url = "/storkitme/"+id
+        let url = "/user/update?uuid="+id
         const res = await apiPut(url,data)
        
 
@@ -126,7 +121,7 @@ export default function StorkitmeCreate() {
     async function onDelete()
     {
 
-      let url = "/storkitme/Delete?uuid="+id
+      let url = "/user/Delete?id="+id
       const res = await apiDelete(url)
 
       router.push(`/`);
@@ -134,6 +129,98 @@ export default function StorkitmeCreate() {
 
 
       return true;
+    }
+
+    async function RemoveStorkitmegroup(uuid:string)
+    {
+       try
+      {
+        setSaving(true);  
+
+        const body = {
+          StorkItmeGroupId: uuid,
+          UserId : [id]
+        };
+
+        await apiDelete('/storkitmegroup/RemoveUser', body)
+      }
+      catch
+      {}
+      finally {
+        setSaving(false);
+      }
+
+    }
+
+    async function AddStorkitmegroup(uuid:any) {
+      setSaving(true);
+
+      try
+      {
+        if(!loggedIn)
+        {
+          return false;
+        }
+
+      const body = {
+        StorkItmeGroupId: uuid,
+        UserId : [id]
+      };
+
+      const res = await apiPut('/storkitmegroup/AddUser', body)
+      }
+      catch
+      {
+      }
+      finally {
+        setSaving(false);
+      }
+    }
+
+    async function AddUsergroup(usergroup:any) {
+      setSaving(true);
+
+      try
+      {
+        if(!loggedIn)
+        {
+          return false;
+        }
+
+      const body = {
+        userGroupId: usergroup,
+        UserId : id
+      };
+
+      const res = await apiPut('/usergroup/AddUser', body)
+      }
+      catch
+      {
+      }
+      finally {
+        setSaving(false);
+      }
+    }
+
+    async function RemoveUser(usergroup:any) {
+      try
+      {
+        setSaving(true);  
+
+        const body = {
+          userGroupId: usergroup,
+          UserId : id
+        };
+
+        apiDelete('/usergroup/RemoveUser', body)
+      }
+      catch
+      {}
+      finally
+      {
+        setSaving(false);  
+      }
+
     }
 
 
@@ -145,6 +232,18 @@ export default function StorkitmeCreate() {
         update a user
         </ThemedText>
 
+<UserForm
+  initialValues={user}
+  onSubmit={updateUser}
+  onDelete={onDelete}
+  userGroups={usergroups}
+  storkItmeGroups={storkitmegroups}
+  thisIsToUpdate
+  onRemoveStorkItmeGroup={RemoveStorkitmegroup}
+  onAddStorkItmeGroup={AddStorkitmegroup}
+  onAddUserGroup={AddUsergroup}
+  onRemoveUserGroup={RemoveUser}
+/>
 
 
 

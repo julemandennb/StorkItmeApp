@@ -51,9 +51,11 @@ export default function UserCreate() {
               return false;
             }
 
-            const res =  apiPost('/user/Create', data);
+            const res = await apiPost('/user/Create', data);
 
-            
+            console.log("res",res)
+
+            router.push("/user/"+res.id)
 
             return true;
           } 
