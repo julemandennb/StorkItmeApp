@@ -14,6 +14,15 @@ export function TextInputWithLabel({
 }: Props) {
   const theme = useTheme();
 
+  const { value, defaultValue, style, ...rest } = textInputProps as any;
+
+  const inputProps: any = { ...rest };
+
+  // Always treat the input as controlled to avoid switching between
+  // controlled and uncontrolled. Use empty string fallback when value
+  // is undefined or null; prefer explicit `value` over `defaultValue`.
+  inputProps.value = value ?? defaultValue ?? '';
+
   return (
     <View>
       <ThemedText type={labelType}>
@@ -22,10 +31,10 @@ export function TextInputWithLabel({
 
       <TextInput
         style={[
-          textInputProps.style,
+          style,
           { color: theme['text'] }
         ]}
-        {...textInputProps}
+        {...inputProps}
       />
     </View>
   );

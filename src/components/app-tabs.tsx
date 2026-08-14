@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function AppTabs() {
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
-    const { loggedIn } = useAuth();
+    const { loggedIn,hasIRightRole } = useAuth();
   
 
   return (
@@ -32,7 +32,7 @@ export default function AppTabs() {
       </NativeTabs.Trigger>
 
 
-      {loggedIn ? (
+      {(loggedIn && hasIRightRole('Manager')) ? (
        
         <NativeTabs.Trigger name="userGroups">
           <NativeTabs.Trigger.Label>User Groups</NativeTabs.Trigger.Label>
@@ -43,10 +43,21 @@ export default function AppTabs() {
         </NativeTabs.Trigger>
       ) : null}
 
-         {loggedIn ? (
+         {(loggedIn && hasIRightRole('Manager')) ? (
        
         <NativeTabs.Trigger name="storkItmeGroups">
           <NativeTabs.Trigger.Label>storkItme Groups</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={require('@/assets/images/tabIcons/explore.png')}
+            renderingMode="template"
+          />
+        </NativeTabs.Trigger>
+      ) : null}
+
+       {(loggedIn && hasIRightRole('Manager')) ? (
+       
+        <NativeTabs.Trigger name="users">
+          <NativeTabs.Trigger.Label>Users</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
             src={require('@/assets/images/tabIcons/explore.png')}
             renderingMode="template"

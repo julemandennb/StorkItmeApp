@@ -19,6 +19,7 @@ export default function RootLayout() {
           <Stack.Screen name="storkitme" options={{ headerShown: false }} />
           <Stack.Screen name="usergroup" options={{ headerShown: false }} />
           <Stack.Screen name="storkitmegroup" options={{ headerShown: false }} />
+          <Stack.Screen name="user" options={{ headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </AuthProvider>
