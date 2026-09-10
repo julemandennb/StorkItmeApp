@@ -1,6 +1,21 @@
-# Welcome to your Expo app 👋
+# StorkItmeApp
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+StorkItmeApp is the cross-platform Expo client for the [StorkItmeServer](https://github.com/julemandennb/StorkItmeServer) API. It provides screens for managing users, user groups, StorkItme items, and StorkItme groups.
+
+The app uses Expo Router for file-based navigation and supports Android, iOS, and web.
+
+## Backend
+
+Run the [StorkItmeServer](https://github.com/julemandennb/StorkItmeServer) API alongside this app. The server is an ASP.NET Core Web API using .NET 10, Entity Framework Core, and PostgreSQL.
+
+See the server repository for database configuration, API setup, authentication, and local development instructions.
+
+## Features
+
+- User and user-group management
+- StorkItme item and group management
+- Authentication and secure local storage
+- Responsive screens for mobile and web
 
 ## Get started
 
